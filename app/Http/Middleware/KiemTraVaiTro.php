@@ -29,19 +29,23 @@ class KiemTraVaiTro
             ->values();
 
         // "admin" duoc hieu la toan bo nhom quan tri (admin truong, admin toa nha, le tan...)
-        if ($danhSachVaiTroBatBuoc->contains(User::ROLE_ADMIN)) {
+        if ($danhSachVaiTroBatBuoc->contains('admin')) {
             $danhSachVaiTroBatBuoc = $danhSachVaiTroBatBuoc
                 ->merge([
-                    User::ROLE_ADMIN,
-                    User::ROLE_ADMIN_TRUONG,
-                    User::ROLE_ADMIN_TOA_NHA,
-                    User::ROLE_LE_TAN,
+                    \App\Enums\UserRole::Admin->value,
+                    \App\Enums\UserRole::AdminTruong->value,
+                    \App\Enums\UserRole::AdminToaNha->value,
+                    \App\Enums\UserRole::LeTan->value,
                 ])
                 ->unique()
                 ->values();
         }
 
-        $dungVaiTro = $danhSachVaiTroBatBuoc->contains((string) $vaitrohientai);
+        $vaitroValue = $vaitrohientai instanceof \App\Enums\UserRole 
+            ? $vaitrohientai->value 
+            : (string) $vaitrohientai;
+
+        $dungVaiTro = $danhSachVaiTroBatBuoc->map(fn($r) => (string)$r)->contains((string)$vaitroValue);
 
         if (! $dungVaiTro) {
             return redirect()

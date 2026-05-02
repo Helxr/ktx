@@ -66,7 +66,7 @@ class SinhvienService implements SinhvienServiceInterface
 
                 $this->terminateActiveContracts($sinhvien->id);
 
-                if (Sinhvien::where('phong_id', $phong->id)->count() >= (int)$phong->succhuamax) {
+                if (Sinhvien::where('phong_id', $phong->id)->count() >= (int)$phong->soluongtoida) {
                     throw new \Exception('Phòng đã đủ người.');
                 }
 
@@ -101,6 +101,6 @@ class SinhvienService implements SinhvienServiceInterface
 
     private function terminateActiveContracts(int $sinhvienId)
     {
-        Hopdong::where('sinhvien_id', $sinhvienId)->where('trang_thai', ContractStatus::Active->value)->update(['trang_thai' => ContractStatus::Terminated->value]);
+        Hopdong::where('sinhvien_id', $sinhvienId)->where('trang_thai', ContractStatus::Active)->update(['trang_thai' => ContractStatus::Terminated]);
     }
 }

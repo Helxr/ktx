@@ -60,8 +60,8 @@
                                     </div>
                                     <h3 class="text-4xl font-display font-bold tracking-tight">Hồ sơ #{{ $dangky->id }}</h3>
                                 </div>
-                                <div class="px-5 py-2.5 text-sm font-bold uppercase tracking-widest border {{ $dangky->trangthai === 'Hoàn tất' ? 'bg-brand-emerald text-white border-brand-emerald' : 'bg-white text-ink-primary border-white' }}">
-                                    {{ $dangky->trangthai }}
+                                <div class="px-5 py-2.5 text-sm font-bold uppercase tracking-widest border {{ $dangky->trangthai->value === \App\Enums\RegistrationStatus::Completed->value ? 'bg-brand-emerald text-white border-brand-emerald' : 'bg-white text-ink-primary border-white' }}">
+                                    {{ $dangky->trangthai->label() }}
                                 </div>
                             </div>
                         </div>
@@ -132,9 +132,9 @@
                                     @php
                                         $statuses = [
                                             ['label' => 'Đã tiếp nhận', 'desc' => 'Hệ thống đã nhận đơn', 'active' => true],
-                                            ['label' => 'Đang thẩm định', 'desc' => 'Admin đang kiểm tra thông tin', 'active' => in_array($dangky->trangthai, ['Đã duyệt', 'Chờ thanh toán', 'Hoàn tất'])],
-                                            ['label' => 'Chờ thanh toán', 'desc' => 'Vui lòng nộp phí giữ chỗ', 'active' => in_array($dangky->trangthai, ['Chờ thanh toán', 'Hoàn tất'])],
-                                            ['label' => 'Hoàn tất', 'desc' => 'Đã sẵn sàng nhận phòng', 'active' => $dangky->trangthai === 'Hoàn tất'],
+                                            ['label' => 'Đang thẩm định', 'desc' => 'Admin đang kiểm tra thông tin', 'active' => in_array($dangky->trangthai->value, [\App\Enums\RegistrationStatus::Approved->value, \App\Enums\RegistrationStatus::ApprovedPendingPayment->value, \App\Enums\RegistrationStatus::Completed->value])],
+                                            ['label' => 'Chờ thanh toán', 'desc' => 'Vui lòng nộp phí giữ chỗ', 'active' => in_array($dangky->trangthai->value, [\App\Enums\RegistrationStatus::ApprovedPendingPayment->value, \App\Enums\RegistrationStatus::Completed->value])],
+                                            ['label' => 'Hoàn tất', 'desc' => 'Đã sẵn sàng nhận phòng', 'active' => $dangky->trangthai->value === \App\Enums\RegistrationStatus::Completed->value],
                                         ];
                                         $currentStep = 0;
                                         foreach($statuses as $idx => $s) if($s['active']) $currentStep = $idx;
@@ -171,7 +171,7 @@
                                 </div>
 
                                 {{-- Action Box --}}
-                                @if($dangky->trangthai === 'Chờ thanh toán')
+                                @if($dangky->trangthai->value === \App\Enums\RegistrationStatus::ApprovedPendingPayment->value)
                                     <div class="mt-16 p-8 bg-brand-emerald/5 border border-brand-emerald/20">
                                         <div class="flex items-center gap-3 mb-4">
                                             <div class="w-8 h-8 bg-brand-emerald text-white flex items-center justify-center text-sm">ℹ</div>

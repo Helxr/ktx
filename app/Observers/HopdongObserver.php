@@ -36,10 +36,13 @@ class HopdongObserver
     {
         // Log nếu trạng thái thay đổi
         if ($hopdong->isDirty('trang_thai')) {
+            $trangThaiCu = $hopdong->getOriginal('trang_thai');
+            $trangThaiMoi = $hopdong->trang_thai;
+
             $this->kiemToanService->ghiNhatKyThayDoiTrangThaiHopDong(
                 $hopdong->id,
-                $hopdong->getOriginal('trang_thai'),
-                $hopdong->trang_thai
+                $trangThaiCu instanceof \BackedEnum ? $trangThaiCu->value : (string)$trangThaiCu,
+                $trangThaiMoi instanceof \BackedEnum ? $trangThaiMoi->value : (string)$trangThaiMoi
             );
         }
     }

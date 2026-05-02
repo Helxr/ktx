@@ -4,7 +4,7 @@
 
 @section('noidung')
     @php
-        $isAlumni = auth()->user()->vaitro === \App\Models\User::ROLE_EX_STUDENT;
+        $isAlumni = auth()->user()->vaitro === \App\Enums\UserRole::CuuSinhVien;
         $tongTienCanDong = (int) $hoadonchuathanhtoan->sum('tongtien');
         $ngayConLaiHopDong = null;
 
@@ -113,7 +113,7 @@
                                 <div class="text-right shrink-0 pl-4">
                                     <div class="font-display text-sm font-black text-ink-primary tabular-nums tracking-tight">{{ number_format($hoadon->tongtien) }}đ</div>
                                     @php
-                                        $isPaid = $hoadon->trangthaithanhtoan === 'paid';
+                                        $isPaid = $hoadon->trangthaithanhtoan === \App\Enums\InvoiceStatus::Paid;
                                     @endphp
                                     <span class="inline-flex items-center rounded-full {{ $isPaid ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20' : 'bg-rose-50 text-rose-700 ring-1 ring-rose-600/20 animate-pulse' }} px-2 py-0.5 text-[8px] font-black uppercase tracking-widest">
                                         {{ $isPaid ? 'Đã trả' : 'Chưa trả' }}

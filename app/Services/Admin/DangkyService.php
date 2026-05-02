@@ -52,19 +52,19 @@ class DangkyService implements DangkyServiceInterface
                 $phong = Phong::where('id', (int)$data['phong_id'])->lockForUpdate()->first();
                 if (!$phong) return $this->traVeLoi('Phòng không tồn tại.');
 
-                if (Sinhvien::where('phong_id', $phong->id)->count() >= (int)$phong->succhuamax) {
+                if (Sinhvien::where('phong_id', $phong->id)->count() >= (int)$phong->soluongtoida) {
                     return $this->traVeLoi(self::MESSAGE_ROOM_CONFLICT);
                 }
 
-                if (Dangky::where('sinhvien_id', $sinhvien->id)->where('trangthai', RegistrationStatus::Pending->value)->exists()) {
+                if (Dangky::where('sinhvien_id', $sinhvien->id)->where('trangthai', RegistrationStatus::Pending)->exists()) {
                     return $this->traVeLoi('Bạn đã gửi đăng ký, vui lòng chờ admin xử lý.');
                 }
 
                 Dangky::create([
                     'sinhvien_id' => $sinhvien->id,
                     'phong_id' => $phong->id,
-                    'loaidangky' => RegistrationType::Rental->value,
-                    'trangthai' => RegistrationStatus::Pending->value,
+                    'loaidangky' => RegistrationType::Rental,
+                    'trangthai' => RegistrationStatus::Pending,
                 ]);
 
                 return $this->traVeThanhCong('Gửi đăng ký phòng thành công.');
@@ -82,13 +82,13 @@ class DangkyService implements DangkyServiceInterface
             if (!$sinhvien || !$sinhvien->phong_id) return $this->traVeLoi('Bạn hiện không có phòng để trả.');
 
             $coHoaDonChuaThanhToan = Hoadon::where('phong_id', $sinhvien->phong_id)
-                ->where('trangthaithanhtoan', InvoiceStatus::Pending->value)
+                ->where('trangthaithanhtoan', InvoiceStatus::Pending)
                 ->exists();
             if ($coHoaDonChuaThanhToan) return $this->traVeLoi('Bạn còn hóa đơn chưa thanh toán.');
 
             if (Dangky::where('sinhvien_id', $sinhvien->id)
-                ->where('trangthai', RegistrationStatus::Pending->value)
-                ->where('loaidangky', RegistrationType::Return->value)
+                ->where('trangthai', RegistrationStatus::Pending)
+                ->where('loaidangky', RegistrationType::Return)
                 ->exists()) {
                 return $this->traVeLoi('Bạn đã gửi yêu cầu trả phòng.');
             }
@@ -96,8 +96,8 @@ class DangkyService implements DangkyServiceInterface
             Dangky::create([
                 'sinhvien_id' => $sinhvien->id,
                 'phong_id' => $sinhvien->phong_id,
-                'loaidangky' => RegistrationType::Return->value,
-                'trangthai' => RegistrationStatus::Pending->value,
+                'loaidangky' => RegistrationType::Return,
+                'trangthai' => RegistrationStatus::Pending,
             ]);
 
             return $this->traVeThanhCong('Gửi yêu cầu trả phòng thành công.');
@@ -119,8 +119,8 @@ class DangkyService implements DangkyServiceInterface
             if ((int)$sinhvien->phong_id === (int)$data['phong_moi_id']) return $this->traVeLoi('Phòng mới phải khác phòng hiện tại.');
 
             if (Dangky::where('sinhvien_id', $sinhvien->id)
-                ->where('trangthai', RegistrationStatus::Pending->value)
-                ->where('loaidangky', RegistrationType::Change->value)
+                ->where('trangthai', RegistrationStatus::Pending)
+                ->where('loaidangky', RegistrationType::Change)
                 ->exists()) {
                 return $this->traVeLoi('Bạn đã gửi yêu cầu đổi phòng.');
             }
@@ -128,8 +128,8 @@ class DangkyService implements DangkyServiceInterface
             Dangky::create([
                 'sinhvien_id' => $sinhvien->id,
                 'phong_id' => (int)$data['phong_moi_id'],
-                'loaidangky' => RegistrationType::Change->value,
-                'trangthai' => RegistrationStatus::Pending->value,
+                'loaidangky' => RegistrationType::Change,
+                'trangthai' => RegistrationStatus::Pending,
                 'ghichu' => $data['lydo'],
             ]);
 
@@ -162,29 +162,30 @@ class DangkyService implements DangkyServiceInterface
             $approvalData = DB::transaction(function () use ($id, $ngayHetHan) {
                 $dangky = Dangky::with(['sinhvien.taikhoan', 'phong'])->where('id', $id)->lockForUpdate()->first();
                 if (!$dangky) throw new \Exception('Không tìm thấy đăng ký.');
-                if ($dangky->trangthai !== RegistrationStatus::Pending->value) throw new \Exception('Đăng ký này đã được xử lý.');
+                if ($dangky->trangthai !== RegistrationStatus::Pending) throw new \Exception('Đăng ký này đã được xử lý.');
 
                 $sinhvien = $dangky->sinhvien;
                 $phong = $dangky->phong;
 
-                if ($dangky->loaidangky === RegistrationType::Return->value) {
+                if ($dangky->loaidangky === RegistrationType::Return) {
                     return $this->approveLeaveRoomLogic($dangky, $sinhvien);
                 }
 
                 $ngayBatDau = now()->format('Y-m-d');
                 $ngayKetThuc = $ngayHetHan ?? now()->addMonths(5)->format('Y-m-d');
 
-                if ($dangky->loaidangky === RegistrationType::Rental->value && $sinhvien?->phong_id) throw new \Exception('Sinh viên đã có phòng.');
+                if ($dangky->loaidangky === RegistrationType::Rental && $sinhvien?->phong_id) throw new \Exception('Sinh viên đã có phòng.');
 
-                if (Sinhvien::where('phong_id', $phong->id)->count() >= (int)$phong->succhuamax) throw new \Exception(self::MESSAGE_ROOM_CONFLICT);
+                if (Sinhvien::where('phong_id', $phong->id)->count() >= (int)$phong->soluongtoida) throw new \Exception(self::MESSAGE_ROOM_CONFLICT);
 
                 $dangky->transitionTo(RegistrationStatus::Approved->value);
 
-                if ($dangky->loaidangky === RegistrationType::Change->value && $sinhvien?->phong_id) {
+                if ($dangky->loaidangky === RegistrationType::Change && $sinhvien?->phong_id) {
                     $this->chamDutHopDongHienTai($sinhvien->id);
                 }
 
                 $sinhvien->update(['phong_id' => $phong->id, 'ngay_vao' => $ngayBatDau, 'ngay_het_han' => $ngayKetThuc]);
+                $sinhvien->refresh();
 
                 $hopdong = Hopdong::create([
                     'sinhvien_id' => $sinhvien->id, 'phong_id' => $phong->id,
@@ -230,7 +231,7 @@ class DangkyService implements DangkyServiceInterface
         try {
             $dangky = DB::transaction(function () use ($id) {
                 $dk = Dangky::where('id', $id)->lockForUpdate()->first();
-                if (!$dk || $dk->trangthai !== RegistrationStatus::Pending->value) throw new \Exception('Không hợp lệ.');
+                if (!$dk || $dk->trangthai !== RegistrationStatus::Pending) throw new \Exception('Không hợp lệ.');
                 $dk->transitionTo(RegistrationStatus::ApprovedPendingPayment->value);
                 return $dk;
             });
@@ -247,7 +248,7 @@ class DangkyService implements DangkyServiceInterface
         try {
             DB::transaction(function () use ($id) {
                 $dangky = Dangky::where('id', $id)->lockForUpdate()->first();
-                if (!$dangky || $dangky->trangthai !== RegistrationStatus::ApprovedPendingPayment->value) throw new \Exception('Không hợp lệ.');
+                if (!$dangky || $dangky->trangthai !== RegistrationStatus::ApprovedPendingPayment) throw new \Exception('Không hợp lệ.');
 
                 // Tạo User
                 $user = $this->taoUserTuDangKy($dangky);
@@ -263,7 +264,7 @@ class DangkyService implements DangkyServiceInterface
 
                 // Cập nhật Dangky
                 $dangky->update([
-                    'trangthai' => RegistrationStatus::Completed->value,
+                    'trangthai' => RegistrationStatus::Completed,
                     'sinhvien_id' => $sinhvien->id
                 ]);
 
@@ -291,7 +292,7 @@ class DangkyService implements DangkyServiceInterface
                 $phong = Phong::where('id', (int)$data['phong_id'])->lockForUpdate()->first();
                 if (!$phong) return $this->traVeLoi('Phòng không tồn tại.');
 
-                if ($phong->dang_o >= $phong->succhua) {
+                if ($phong->dango >= $phong->soluongtoida) {
                     return $this->traVeLoi('Phòng đã đầy.');
                 }
 
@@ -306,8 +307,8 @@ class DangkyService implements DangkyServiceInterface
                     'phong_id' => $data['phong_id'],
                     'anh_the_path' => $filePaths['anh_the'],
                     'anh_cccd_path' => $filePaths['anh_cccd'],
-                    'trangthai' => RegistrationStatus::Pending->value,
-                    'loaidangky' => RegistrationType::Rental->value,
+                    'trangthai' => RegistrationStatus::Pending,
+                    'loaidangky' => RegistrationType::Rental,
                     'lookup_token' => $lookupToken,
                 ]);
 
@@ -399,7 +400,7 @@ class DangkyService implements DangkyServiceInterface
             'giuong_no' => $dangky->giuong_no,
             'ngay_bat_dau' => now()->format('Y-m-d'),
             'ngay_ket_thuc' => now()->addMonths(5)->format('Y-m-d'),
-            'trang_thai' => ContractStatus::Active->value,
+            'trang_thai' => ContractStatus::Active,
             'loai_hop_dong' => 'Thuê phòng'
         ]);
     }

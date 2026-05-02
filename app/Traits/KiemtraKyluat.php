@@ -134,7 +134,8 @@ trait KiemtraKyluat
     {
         return $loiConHieuLuc->map(function (Kyluat $kyluat, int $index) {
             $ngay = $kyluat->ngayvipham ? Carbon::parse($kyluat->ngayvipham)->format('d/m/Y') : 'Khong ro ngay';
-            $mucDo = trim((string) ($kyluat->mucdo ?? 'Khong ro muc do'));
+            $mucDoRaw = $kyluat->mucdo;
+            $mucDo = $mucDoRaw instanceof \App\Enums\DisciplineLevel ? $mucDoRaw->label() : trim((string) ($mucDoRaw ?? 'Khong ro muc do'));
             $noiDung = trim((string) ($kyluat->noidung ?? 'Khong co noi dung'));
 
             return '#'.($index + 1).' ['.$ngay.'] '.$mucDo.': '.$noiDung;

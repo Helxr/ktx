@@ -4,10 +4,20 @@ namespace App\Enums;
 
 enum MaintenanceStatus: string
 {
-    case PENDING = 'Chờ sửa';
-    case SCHEDULED = 'Đã hẹn';
-    case IN_PROGRESS = 'Đang sửa';
-    case COMPLETED = 'Đã xong';
+    case Pending    = 'pending';
+    case Scheduled  = 'scheduled';
+    case InProgress = 'in_progress';
+    case Completed  = 'completed';
+
+    public function label(): string
+    {
+        return match($this) {
+            self::Pending    => 'Chờ sửa',
+            self::Scheduled  => 'Đã hẹn',
+            self::InProgress => 'Đang sửa',
+            self::Completed  => 'Đã xong',
+        };
+    }
 
     public static function values(): array
     {

@@ -44,3 +44,37 @@ tools/
 
 # GitNexus database
 .gitnexus/
+# AI & ML Cache (Nguyên nhân gây crash chính)
+undefined/
+.claude/
+.windsurf/
+*.onnx
+*.bin
+
+# Documentation & Reports
+ARCHITECTURE_REPORT.md
+audit_tree.txt
+tree.txt
+error_log.txt
+build-log.txt
+
+# Media & Assets (Nặng, không chứa logic code)
+public/images/
+resources/views/vendor/
+# Loại bỏ các file log cây thư mục khổng lồ
+tree.txt
+audit_tree.txt
+build-log.txt
+ARCHITECTURE_REPORT.md
+
+# Loại bỏ các thư mục công cụ và cache AI
+.claude/
+.windsurf/
+.planning/
+scratch/
+.gitnexus/
+
+composer.lock
+package-lock.json
+*.log
+storage/

@@ -22,42 +22,42 @@ class AuthServiceProvider extends ServiceProvider
     {
         Gate::define('dangky.review', function (User $user): bool {
             return $user->hasAnyRole([
-                User::ROLE_ADMIN,
-                User::ROLE_ADMIN_TRUONG,
-                User::ROLE_ADMIN_TOA_NHA,
-                User::ROLE_LE_TAN,
+                \App\Enums\UserRole::Admin,
+                \App\Enums\UserRole::AdminTruong,
+                \App\Enums\UserRole::AdminToaNha,
+                \App\Enums\UserRole::LeTan,
             ]);
         });
 
         Gate::define('hopdong.manage', function (User $user): bool {
             return $user->hasAnyRole([
-                User::ROLE_ADMIN,
-                User::ROLE_ADMIN_TRUONG,
-                User::ROLE_ADMIN_TOA_NHA,
+                \App\Enums\UserRole::Admin,
+                \App\Enums\UserRole::AdminTruong,
+                \App\Enums\UserRole::AdminToaNha,
             ]);
         });
 
         Gate::define('hoadon.manage', function (User $user): bool {
             return $user->hasAnyRole([
-                User::ROLE_ADMIN,
-                User::ROLE_ADMIN_TRUONG,
-                User::ROLE_ADMIN_TOA_NHA,
-                User::ROLE_LE_TAN,
+                \App\Enums\UserRole::Admin,
+                \App\Enums\UserRole::AdminTruong,
+                \App\Enums\UserRole::AdminToaNha,
+                \App\Enums\UserRole::LeTan,
             ]);
         });
 
         Gate::define('cauhinh.manage', function (User $user): bool {
             return $user->hasAnyRole([
-                User::ROLE_ADMIN,
-                User::ROLE_ADMIN_TRUONG,
+                \App\Enums\UserRole::Admin,
+                \App\Enums\UserRole::AdminTruong,
             ]);
         });
 
         Gate::define('kyluat.manage', function (User $user): bool {
             return $user->hasAnyRole([
-                User::ROLE_ADMIN,
-                User::ROLE_ADMIN_TRUONG,
-                User::ROLE_ADMIN_TOA_NHA,
+                \App\Enums\UserRole::Admin,
+                \App\Enums\UserRole::AdminTruong,
+                \App\Enums\UserRole::AdminToaNha,
             ]);
         });
     }

@@ -83,7 +83,7 @@
                                     };
                                 @endphp
                                 <span class="inline-flex items-center rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider {{ $colorClass }}">
-                                    {{ \App\Enums\DisciplineLevel::from($item->mucdo)->label() }}
+                                    {{ $item->mucdo->label() }}
                                 </span>
                             </td>
                             <td class="px-6 py-5 text-right">

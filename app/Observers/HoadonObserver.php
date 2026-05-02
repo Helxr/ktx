@@ -35,10 +35,13 @@ class HoadonObserver
     {
         // Log nếu trạng thái thanh toán thay đổi
         if ($hoadon->isDirty('trangthaithanhtoan')) {
+            $trangThaiCu = $hoadon->getOriginal('trangthaithanhtoan');
+            $trangThaiMoi = $hoadon->trangthaithanhtoan;
+
             $this->kiemToanService->ghiNhatKyThayDoiTrangThaiThanhToanHoaDon(
                 $hoadon->id,
-                $hoadon->getOriginal('trangthaithanhtoan'),
-                $hoadon->trangthaithanhtoan
+                $trangThaiCu instanceof \BackedEnum ? $trangThaiCu->value : (string)$trangThaiCu,
+                $trangThaiMoi instanceof \BackedEnum ? $trangThaiMoi->value : (string)$trangThaiMoi
             );
         }
     }

@@ -32,13 +32,14 @@ class TaiChinhService implements TaiChinhServiceInterface
     public function layBaoCaoNoDong(Request $request): array
     {
         $raw = $this->lietKeCongNo($request);
-        $hoaDons = collect($raw['hoadons'] ?? []);
+        $hoaDons = collect($raw['hoadons']->items());
 
         $grouped = $hoaDons->groupBy('phong_id')->map(function ($items, $phongId) {
             $sinhviens = $items->pluck('sinhvien')->filter()->unique('id')->values();
+            $phong = $items->first()->phong ?? null;
 
             return [
-                'phong' => Phong::find($phongId),
+                'phong' => $phong,
                 'sinhvien' => $sinhviens,
                 'hoadon' => $items->values(),
                 'tongtien' => (int) $items->sum('tongtien'),

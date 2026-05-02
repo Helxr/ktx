@@ -37,7 +37,7 @@ class ProfileController extends Controller
         $nguoiDung->save();
 
         // Cập nhật thông tin sinh viên nếu có
-        if ($nguoiDung->vaitro === 'sinhvien') {
+        if ($nguoiDung->vaitro instanceof \App\Enums\UserRole ? $nguoiDung->vaitro === \App\Enums\UserRole::SinhVien : $nguoiDung->vaitro === 'sinhvien') {
             $sinhvien = $nguoiDung->sinhvien ?? new \App\Models\Sinhvien(['user_id' => $nguoiDung->id]);
             $sinhvien->fill([
                 'masinhvien' => $request->masinhvien,

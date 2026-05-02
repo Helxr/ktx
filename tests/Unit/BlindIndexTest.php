@@ -12,14 +12,15 @@ class BlindIndexTest extends TestCase
 
     public function test_blind_index_tao_tu_dong_khi_luu_dangky()
     {
+        $phong = \App\Models\Phong::create(['tenphong' => 'P101', 'giaphong' => 1000, 'soluongtoida' => 4, 'gioitinh' => 'Nam']);
         $dangky = Dangky::create([
             'ho_ten' => 'Nguyễn Văn A',
             'email' => 'nguyenvana@example.com',
             'so_dien_thoai' => '0912345678',
             'so_cccd' => '123456789',
-            'phong_id' => 1,
-            'trang_thai' => 'cho_xu_ly',
-            'loai_dang_ky' => 'guest',
+            'phong_id' => $phong->id,
+            'trangthai' => \App\Enums\RegistrationStatus::Pending,
+            'loaidangky' => \App\Enums\RegistrationType::Rental,
             'lookup_token' => 'test-token',
         ]);
 
@@ -31,15 +32,17 @@ class BlindIndexTest extends TestCase
 
     public function test_tim_kiem_bang_so_dien_thoai_tren_du_lieu_ma_hoa()
     {
+        $phong1 = \App\Models\Phong::create(['tenphong' => 'P101', 'giaphong' => 1000, 'soluongtoida' => 4, 'gioitinh' => 'Nam']);
+        $phong2 = \App\Models\Phong::create(['tenphong' => 'P102', 'giaphong' => 1000, 'soluongtoida' => 4, 'gioitinh' => 'Nam']);
         // Tạo dữ liệu test
         Dangky::create([
             'ho_ten' => 'Nguyễn Văn A',
             'email' => 'nguyenvana@example.com',
             'so_dien_thoai' => '0912345678',
             'so_cccd' => '123456789',
-            'phong_id' => 1,
-            'trang_thai' => 'cho_xu_ly',
-            'loai_dang_ky' => 'guest',
+            'phong_id' => $phong1->id,
+            'trangthai' => \App\Enums\RegistrationStatus::Pending,
+            'loaidangky' => \App\Enums\RegistrationType::Rental,
             'lookup_token' => 'test-token-1',
         ]);
 
@@ -48,9 +51,9 @@ class BlindIndexTest extends TestCase
             'email' => 'tranthib@example.com',
             'so_dien_thoai' => '0987654321',
             'so_cccd' => '987654321',
-            'phong_id' => 2,
-            'trang_thai' => 'cho_xu_ly',
-            'loai_dang_ky' => 'guest',
+            'phong_id' => $phong2->id,
+            'trangthai' => \App\Enums\RegistrationStatus::Pending,
+            'loaidangky' => \App\Enums\RegistrationType::Rental,
             'lookup_token' => 'test-token-2',
         ]);
 

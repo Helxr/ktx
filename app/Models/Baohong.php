@@ -28,6 +28,7 @@ class Baohong extends Model
 
     protected $casts = [
         'do_sinh_vien_gay_ra' => 'boolean',
+        'trangthai' => \App\Enums\MaintenanceStatus::class,
     ];
 
     public function sinhvien(): BelongsTo

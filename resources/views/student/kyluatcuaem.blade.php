@@ -44,15 +44,15 @@
                                 </td>
                                 <td class="px-8 py-6 text-center">
                                     @php
-                                        $mucdo = strtolower($item->mucdo);
-                                        $badgeClass = match(true) {
-                                            str_contains($mucdo, 'nặng') || str_contains($mucdo, 'buộc') => 'bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-600/20 animate-pulse',
-                                            str_contains($mucdo, 'cảnh cáo') || str_contains($mucdo, 'trung bình') => 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20',
+                                        $mucdoEnum = $item->mucdo;
+                                        $badgeClass = match($mucdoEnum) {
+                                            \App\Enums\DisciplineLevel::High => 'bg-rose-50 text-rose-700 ring-1 ring-inset ring-rose-600/20 animate-pulse',
+                                            \App\Enums\DisciplineLevel::Medium => 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20',
                                             default => 'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10'
                                         };
                                     @endphp
                                     <span class="inline-flex items-center rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest {{ $badgeClass }}">
-                                        {{ $item->mucdo }}
+                                        {{ $mucdoEnum->label() }}
                                     </span>
                                 </td>
                             </tr>

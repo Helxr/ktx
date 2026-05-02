@@ -76,7 +76,7 @@ Route::prefix('admin')
             Route::get('/duyetdangky', 'lietKeDangKyAdmin')->name('duyetdangky');
             Route::post('/duyetdangky/{id}', 'duyetDangKy')->name('xulyduyetdangky');
             Route::post('/duyethoso/{id}', 'duyetHoSo')->name('duyethoso');
-            Route::post('/xacnhanthanhtoan-dangky/{id}', 'confirmPayment')->name('dangky.xacnhanthanhtoan');
+            Route::post('/xacnhanthanhtoan-dangky/{id}', 'xacNhanThanhToan')->name('dangky.xacnhanthanhtoan');
             Route::post('/tuchoidangky/{id}', 'tuChoiDangKy')->name('xulytuchoidangky');
         });
 
@@ -84,7 +84,7 @@ Route::prefix('admin')
         Route::controller('HoadonController')->middleware('can:hoadon.manage')->group(function () {
             Route::get('/quanlyhoadon', 'lietKeHoaDonAdmin')->name('quanlyhoadon');
             Route::post('/xulyhoadon', 'xuLyHoaDon')->name('xulyhoadon');
-            Route::post('/xacnhanthanhtoan/{id}', 'confirmPayment')->name('xacnhanthanhtoan');
+            Route::post('/xacnhanthanhtoan/{id}', 'xacNhanThanhToan')->name('xacnhanthanhtoan');
             Route::get('/hoadon/{id}/pdf', 'downloadInvoicePDF')->name('hoadon.pdf');
         });
         Route::controller('CongnoController')->group(function () {
@@ -155,7 +155,7 @@ Route::prefix('student')
             Route::get('/hoadoncuaem', 'layHoaDonSinhVien')->name('hoadoncuaem');
             Route::get('/phongcuatoi/hoadon', 'layHoaDonSinhVien')->name('phongcuatoi.hoadon');
             Route::get('/phongcuatoi/hoadon/{id}', 'layChiTietHoaDonSinhVien')->name('phongcuatoi.hoadon.chitiet');
-            Route::post('/hoadon/{id}/xac-nhan-loi', 'confirmPenalty')->name('hoadon.confirm_penalty');
+            Route::post('/hoadon/{id}/xac-nhan-loi', 'xacNhanViPham')->name('hoadon.confirm_penalty');
         });
 
         // Đăng ký & Chuyển phòng
@@ -206,8 +206,8 @@ Route::get('/private-files/{path}', [FileController::class, 'showPrivateFile'])
 
 // Trạm điều hướng trung gian
 Route::get('/dieuhuong', function () {
-    $vaitro = Auth::user()->vaitro;
-    if (in_array($vaitro, ['admin', 'admin_truong', 'admin_toanha', 'le_tan'], true)) {
+    $user = Auth::user();
+    if ($user->isAdminGroup()) {
         return redirect()->route('admin.trangchu');
     }
     return redirect()->route('student.trangchu');

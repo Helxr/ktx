@@ -14,39 +14,23 @@ class Dangky extends Model
 
     protected $table = 'dangky';
 
-    public const LOAI_THUE_PHONG = 'Thuê phòng';
-    public const LOAI_TRA_PHONG = 'Trả phòng';
-    public const LOAI_DOI_PHONG = 'Doi phong';
 
-    public static function trangThaiChoXuLy(): string
-    {
-        return RegistrationStatus::Pending->value;
-    }
-
-    public static function trangThaiDaDuyet(): string
-    {
-        return RegistrationStatus::Approved->value;
-    }
-
-    public static function trangThaiTuChoi(): string
-    {
-        return RegistrationStatus::Rejected->value;
-    }
 
     private const ALLOWED_TRANSITIONS = [
-        'Chờ xử lý' => [
-            'Chờ thanh toán',
-            'Từ chối',
+        'pending' => [
+            'approved_pending_payment',
+            'approved',
+            'rejected',
         ],
-        'Chờ thanh toán' => [
-            'Hoàn tất',
-            'Từ chối',
+        'approved_pending_payment' => [
+            'completed',
+            'rejected',
         ],
-        'Đã duyệt' => [
-            'Hoàn tất',
+        'approved' => [
+            'completed',
         ],
-        'Hoàn tất' => [],
-        'Từ chối' => [],
+        'completed' => [],
+        'rejected' => [],
     ];
 
     protected $fillable = [
@@ -68,6 +52,8 @@ class Dangky extends Model
 
     protected $casts = [
         'expires_at' => 'datetime',
+        'trangthai' => RegistrationStatus::class,
+        'loaidangky' => \App\Enums\RegistrationType::class,
     ];
 
     public function getHoTenAttribute($value)
@@ -185,41 +171,36 @@ class Dangky extends Model
         return $query->where('so_cccd_blind_index', hash('sha256', $normalized));
     }
 
-    public function canTransitionTo(string $targetState): bool
+    public function canTransitionTo(string|RegistrationStatus $targetState): bool
     {
-        $currentState = $this->normalizeState($this->trangthai);
-        $targetState = $this->normalizeState($targetState);
+        $currentState = $this->trangthai instanceof RegistrationStatus 
+            ? $this->trangthai->value 
+            : $this->trangthai;
+
+        $targetValue = $targetState instanceof RegistrationStatus 
+            ? $targetState->value 
+            : $targetState;
 
         if (! array_key_exists($currentState, self::ALLOWED_TRANSITIONS)) {
             return false;
         }
 
-        return in_array($targetState, self::ALLOWED_TRANSITIONS[$currentState], true);
+        return in_array($targetValue, self::ALLOWED_TRANSITIONS[$currentState], true);
     }
 
-    public function transitionTo(string $targetState, ?string $note = null): bool
+    public function transitionTo(string|RegistrationStatus $targetState, ?string $note = null): bool
     {
-        $targetState = $this->normalizeState($targetState);
+        $targetValue = $targetState instanceof RegistrationStatus 
+            ? $targetState->value 
+            : $targetState;
 
-        if (! $this->canTransitionTo($targetState)) {
+        if (! $this->canTransitionTo($targetValue)) {
             return false;
         }
 
         return $this->update([
-            'trangthai' => $targetState,
+            'trangthai' => $targetValue,
             'ghichu' => $note,
         ]);
-    }
-
-    private function normalizeState(string $state): string
-    {
-        return match ($state) {
-            'Cho xu ly' => self::trangThaiChoXuLy(),
-            'Cho thanh toan' => RegistrationStatus::ApprovedPendingPayment->value,
-            'Da duyet' => self::trangThaiDaDuyet(),
-            'Hoan tat' => RegistrationStatus::Completed->value,
-            'Tu choi' => self::trangThaiTuChoi(),
-            default => $state,
-        };
     }
 }

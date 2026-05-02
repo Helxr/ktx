@@ -16,28 +16,19 @@ class Hopdong extends Model
 
     public static function trangThaiDangHieuLuc(): string
     {
-        return ContractStatus::Active->value;
+        return \App\Enums\ContractStatus::Active->value;
     }
 
-    public static function trangThaiHetHan(): string
-    {
-        return ContractStatus::Expired->value;
-    }
-
-    public static function trangThaiDaThanhLy(): string
-    {
-        return ContractStatus::Terminated->value;
-    }
 
     private const ALLOWED_TRANSITIONS = [
-        'Dang hieu luc' => [
-            'Het han',
-            'Da thanh ly',
+        'active' => [
+            'expired',
+            'terminated',
         ],
-        'Het han' => [
-            'Da thanh ly',
+        'expired' => [
+            'terminated',
         ],
-        'Da thanh ly' => [],
+        'terminated' => [],
     ];
 
     protected $fillable = [
@@ -48,6 +39,9 @@ class Hopdong extends Model
         'giaphong_luc_ky',
         'trang_thai',
         'ghichu',
+    ];
+    protected $casts = [
+        'trang_thai' => ContractStatus::class,
     ];
 
     public function sinhvien(): BelongsTo
@@ -60,39 +54,36 @@ class Hopdong extends Model
         return $this->belongsTo(Phong::class, 'phong_id');
     }
 
-    public function canTransitionTo(string $targetState): bool
+    public function canTransitionTo(string|ContractStatus $targetState): bool
     {
-        $currentState = $this->normalizeState($this->trang_thai);
-        $targetState = $this->normalizeState($targetState);
+        $currentState = $this->trang_thai instanceof ContractStatus 
+            ? $this->trang_thai->value 
+            : $this->trang_thai;
+
+        $targetValue = $targetState instanceof ContractStatus 
+            ? $targetState->value 
+            : $targetState;
 
         if (! array_key_exists($currentState, self::ALLOWED_TRANSITIONS)) {
             return false;
         }
 
-        return in_array($targetState, self::ALLOWED_TRANSITIONS[$currentState], true);
+        return in_array($targetValue, self::ALLOWED_TRANSITIONS[$currentState], true);
     }
 
-    public function transitionTo(string $targetState, ?string $note = null): bool
+    public function transitionTo(string|ContractStatus $targetState, ?string $note = null): bool
     {
-        $targetState = $this->normalizeState($targetState);
+        $targetValue = $targetState instanceof ContractStatus 
+            ? $targetState->value 
+            : $targetState;
 
-        if (! $this->canTransitionTo($targetState)) {
+        if (! $this->canTransitionTo($targetValue)) {
             return false;
         }
 
         return $this->update([
-            'trang_thai' => $targetState,
+            'trang_thai' => $targetValue,
             'ghichu' => $note,
         ]);
-    }
-
-    private function normalizeState(string $state): string
-    {
-        return match ($state) {
-            'Dang hieu luc' => self::trangThaiDangHieuLuc(),
-            'Het han' => self::trangThaiHetHan(),
-            'Da thanh ly' => self::trangThaiDaThanhLy(),
-            default => $state,
-        };
     }
 }

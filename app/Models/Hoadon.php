@@ -19,36 +19,30 @@ class Hoadon extends Model
     public const LOAI_MONTHLY  = 'monthly';   // Hóa đơn tháng thường
     public const LOAI_DEPOSIT  = 'deposit';   // Phí thế chân
     public const LOAI_PENALTY  = 'penalty';   // Phí bồi thường lỗi thiết bị
-
-    public const TRANGTHAI_QUA_HAN = 'Quá hạn';
+    
+    public static function trangThaiQuaHan(): string
+    {
+        return \App\Enums\InvoiceStatus::Overdue->value;
+    }
 
     public static function trangThaiChuaThanhToan(): string
     {
-        return 'Chưa thanh toán';
+        return \App\Enums\InvoiceStatus::Pending->value;
     }
 
-    public static function trangThaiDaThanhToan(): string
-    {
-        return 'Đã thanh toán';
-    }
-
-    public static function trangThaiQuaHan(): string
-    {
-        return 'Quá hạn';
-    }
 
     private const ALLOWED_TRANSITIONS = [
-        'Chờ xác nhận' => [
-            'Chưa thanh toán',
+        'pending_confirmation' => [
+            'pending',
         ],
-        'Chưa thanh toán' => [
-            'Đã thanh toán',
-            'Quá hạn',
+        'pending' => [
+            'paid',
+            'overdue',
         ],
-        'Quá hạn' => [
-            'Đã thanh toán',
+        'overdue' => [
+            'paid',
         ],
-        'Đã thanh toán' => [],
+        'paid' => [],
     ];
 
     protected $fillable = [
@@ -72,6 +66,7 @@ class Hoadon extends Model
     ];
 
     protected $casts = [
+        'trangthaithanhtoan' => \App\Enums\InvoiceStatus::class,
         'calculation_details' => 'array',
     ];
 
@@ -85,38 +80,35 @@ class Hoadon extends Model
         return $this->belongsTo(Sinhvien::class, 'sinhvien_id');
     }
 
-    public function canTransitionTo(string $targetState): bool
+    public function canTransitionTo(string|InvoiceStatus $targetState): bool
     {
-        $currentState = $this->normalizeState($this->trangthaithanhtoan);
-        $targetState = $this->normalizeState($targetState);
+        $currentState = $this->trangthaithanhtoan instanceof InvoiceStatus 
+            ? $this->trangthaithanhtoan->value 
+            : $this->trangthaithanhtoan;
+
+        $targetValue = $targetState instanceof InvoiceStatus 
+            ? $targetState->value 
+            : $targetState;
 
         if (! array_key_exists($currentState, self::ALLOWED_TRANSITIONS)) {
             return false;
         }
 
-        return in_array($targetState, self::ALLOWED_TRANSITIONS[$currentState], true);
+        return in_array($targetValue, self::ALLOWED_TRANSITIONS[$currentState], true);
     }
 
-    public function transitionTo(string $targetState): bool
+    public function transitionTo(string|InvoiceStatus $targetState): bool
     {
-        $targetState = $this->normalizeState($targetState);
+        $targetValue = $targetState instanceof InvoiceStatus 
+            ? $targetState->value 
+            : $targetState;
 
-        if (! $this->canTransitionTo($targetState)) {
+        if (! $this->canTransitionTo($targetValue)) {
             return false;
         }
 
         return $this->update([
-            'trangthaithanhtoan' => $targetState,
+            'trangthaithanhtoan' => $targetValue,
         ]);
-    }
-
-    private function normalizeState(string $state): string
-    {
-        return match ($state) {
-            'Chua thanh toan' => self::trangThaiChuaThanhToan(),
-            'Da thanh toan' => self::trangThaiDaThanhToan(),
-            'Qua han' => self::TRANGTHAI_QUA_HAN,
-            default => $state,
-        };
     }
 }

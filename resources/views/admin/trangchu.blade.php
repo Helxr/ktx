@@ -85,22 +85,6 @@
         </article>
 
         <!-- 2. Financial Pulse (Span 4) -->
-                    <div class="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/10">
-                        <div class="h-full bg-brand-emerald transition-all duration-1000" style="width: {{ $tyLeLapDay }}%;"></div>
-                    </div>
-                </div>
-                <div class="rounded-lg border border-slate-700 bg-slate-800/70 px-4 py-3">
-                    <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70 mb-1">Sẵn sàng</div>
-                    <div class="text-2xl font-display font-black tracking-tighter">{{ $phongTrong }}</div>
-                </div>
-                <div class="rounded-lg border border-slate-700 bg-slate-800/70 px-4 py-3">
-                    <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70 mb-1">Bảo trì</div>
-                    <div class="text-2xl font-display font-black tracking-tighter text-white">{{ $phongBaoTri }}</div>
-                </div>
-            </div>
-        </article>
-
-        <!-- 2. Financial Pulse (Span 4) -->
         <article class="md:col-span-12 xl:col-span-4 rounded-xl bg-white border border-ui-border p-6 shadow-sm flex flex-col justify-between relative overflow-hidden">
 
             <div class="relative z-10">
@@ -317,7 +301,7 @@
                                 <span class="text-ink-primary tabular-nums">{{ $toa['value'] }}%</span>
                             </div>
                             <div class="h-2 rounded-full bg-ui-bg overflow-hidden ring-1 ring-ui-border/50 p-0.5">
-                                <div class="h-full rounded-full bg-slate-700 transition-all duration-700 ease-out" style="didthth: {{ (int)$toa['value'] }
+                                <div class="h-full rounded-full bg-slate-700 transition-all duration-700 ease-out" style="width: {{ (int)$toa['value'] }}%">
                             </div>
                         </div>
                     @endforeach
@@ -339,7 +323,7 @@
                                 <span class="text-white tabular-nums font-black">{{ number_format($item['value']) }}đ</span>
                             </div>
                             <div class="h-1 rounded-full bg-white/5 overflow-hidden ring-1 ring-white/10">
-                                <div class="h-full rounded-full bg-slate-400 transition-all duration-700" style="didthth: {anTram .  . '%''%'
+                                <div class="h-full rounded-full bg-slate-400 transition-all duration-700" style="width: {{ $phanTram }}%">
                             </div>
                         </div>
                     @endforeach

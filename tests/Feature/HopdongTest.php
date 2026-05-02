@@ -37,7 +37,7 @@ class HopdongTest extends TestCase
         $user = User::factory()->create([
             'name' => 'SV Test',
             'email' => 'svtest@example.com',
-            'vaitro' => 'sinhvien',
+            'vaitro' => \App\Enums\UserRole::SinhVien,
             'gioitinh' => 'Nam',
         ]);
 
@@ -54,27 +54,28 @@ class HopdongTest extends TestCase
 
     public function test_admin_duyet_dangky_tao_hopdong()
     {
+        $this->withoutExceptionHandling();
         $admin = $this->taoAdmin();
         $data = $this->taoSinhVienVaPhong();
 
-        Dangky::create([
+        $dangky = Dangky::create([
             'sinhvien_id' => $data['sinhvien']->id,
             'phong_id' => $data['phong']->id,
-            'loaidangky' => Dangky::LOAI_THUE_PHONG,
-            'trangthai' => Dangky::TRANGTHAI_CHO_XU_LY,
+            'loaidangky' => \App\Enums\RegistrationType::Rental,
+            'trangthai' => \App\Enums\RegistrationStatus::Pending,
             'ghichu' => null,
         ]);
 
         $ngayHetHan = now()->addMonths(6)->format('Y-m-d');
 
-        $response = $this->actingAs($admin)->post(route('admin.xulyduyetdangky', 1), ['ngay_het_han' => $ngayHetHan]);
+        $response = $this->actingAs($admin)->post(route('admin.xulyduyetdangky', $dangky->id), ['ngay_het_han' => $ngayHetHan]);
 
         $response->assertRedirect();
 
         $this->assertDatabaseHas('hopdong', [
             'sinhvien_id' => $data['sinhvien']->id,
             'phong_id' => $data['phong']->id,
-            'trang_thai' => Hopdong::TRANGTHAI_DANG_HIEU_LUC,
+            'trang_thai' => \App\Enums\ContractStatus::Active->value,
         ]);
 
         $this->assertDatabaseHas('sinhvien', [
@@ -86,6 +87,7 @@ class HopdongTest extends TestCase
 
     public function test_admin_giahan_hopdong()
     {
+        $this->withoutExceptionHandling();
         $admin = $this->taoAdmin();
         $data = $this->taoSinhVienVaPhong();
 
@@ -95,7 +97,7 @@ class HopdongTest extends TestCase
             'ngay_bat_dau' => now()->format('Y-m-d'),
             'ngay_ket_thuc' => now()->addMonths(3)->format('Y-m-d'),
             'giaphong_luc_ky' => 2000000,
-            'trang_thai' => Hopdong::TRANGTHAI_DANG_HIEU_LUC,
+            'trang_thai' => \App\Enums\ContractStatus::Active->value,
         ]);
 
         $data['sinhvien']->update(['phong_id' => $data['phong']->id]);
@@ -117,6 +119,7 @@ class HopdongTest extends TestCase
 
     public function test_admin_thanhly_hopdong_va_giai_phong()
     {
+        $this->withoutExceptionHandling();
         $admin = $this->taoAdmin();
         $data = $this->taoSinhVienVaPhong();
 
@@ -126,7 +129,7 @@ class HopdongTest extends TestCase
             'ngay_bat_dau' => now()->subMonths(3)->format('Y-m-d'),
             'ngay_ket_thuc' => now()->addMonths(2)->format('Y-m-d'),
             'giaphong_luc_ky' => 2000000,
-            'trang_thai' => Hopdong::TRANGTHAI_DANG_HIEU_LUC,
+            'trang_thai' => \App\Enums\ContractStatus::Active->value,
         ]);
         $data['sinhvien']->update(['phong_id' => $data['phong']->id, 'ngay_vao' => now()->subMonths(3)->format('Y-m-d'), 'ngay_het_han' => now()->addMonths(2)->format('Y-m-d')]);
 
@@ -135,7 +138,7 @@ class HopdongTest extends TestCase
 
         $this->assertDatabaseHas('hopdong', [
             'id' => $hopdong->id,
-            'trang_thai' => Hopdong::TRANGTHAI_DA_THANH_LY,
+            'trang_thai' => \App\Enums\ContractStatus::Terminated->value,
         ]);
 
         $this->assertDatabaseHas('sinhvien', [
@@ -165,7 +168,7 @@ class HopdongTest extends TestCase
             'ngay_bat_dau' => now()->subMonths(3)->format('Y-m-d'),
             'ngay_ket_thuc' => now()->addMonths(2)->format('Y-m-d'),
             'giaphong_luc_ky' => 2000000,
-            'trang_thai' => Hopdong::TRANGTHAI_DANG_HIEU_LUC,
+            'trang_thai' => \App\Enums\ContractStatus::Active->value,
         ]);
 
         $data['sinhvien']->update(['phong_id' => $data['phong']->id]);
@@ -175,7 +178,7 @@ class HopdongTest extends TestCase
 
         $this->assertDatabaseHas('hopdong', [
             'id' => $hopdong->id,
-            'trang_thai' => Hopdong::TRANGTHAI_DA_THANH_LY,
+            'trang_thai' => \App\Enums\ContractStatus::Terminated->value,
         ]);
 
         $this->assertDatabaseHas('sinhvien', [

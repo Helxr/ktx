@@ -25,11 +25,11 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
         return [
             'vaitro' => Auth::user()->vaitro ?? 'admin', 'tongphong' => Phong::count(), 'tongphongtrong' => $this->demPhongConTrong(),
             'tongsinhvien' => Sinhvien::count(), 'dangkychoxuly' => Dangky::where('trangthai', RegistrationStatus::Pending->value)->count(),
-            'baohongchosua' => Baohong::where('trangthai', 'Chờ sửa')->count(),
-            'hoadonchuathanhtoan' => Hoadon::where('thang', $t)->where('nam', $n)->where('trangthaithanhtoan', 'Chưa thanh toán')->count(),
-            'doanhthuthang' => (int)Hoadon::where('thang', $t)->where('nam', $n)->where('trangthaithanhtoan', 'Đã thanh toán')->sum('tongtien'),
+            'baohongchosua' => Baohong::where('trangthai', \App\Enums\MaintenanceStatus::Pending->value)->count(),
+            'hoadonchuathanhtoan' => Hoadon::where('thang', $t)->where('nam', $n)->where('trangthaithanhtoan', InvoiceStatus::Pending->value)->count(),
+            'doanhthuthang' => (int)Hoadon::where('thang', $t)->where('nam', $n)->where('trangthaithanhtoan', InvoiceStatus::Paid->value)->sum('tongtien'),
             'danhsachdangkygannhat' => Dangky::where('trangthai', RegistrationStatus::Pending->value)->orderByDesc('id')->limit(5)->get(),
-            'danhsachbaohonggannhat' => Baohong::where('trangthai', 'Chờ sửa')->orderByDesc('id')->limit(5)->get(),
+            'danhsachbaohonggannhat' => Baohong::where('trangthai', \App\Enums\MaintenanceStatus::Pending->value)->orderByDesc('id')->limit(5)->get(),
             'thanghientai' => $t, 'namhientai' => $n, 'doanhthugannhat' => $this->layXuHuongDoanhThu(), 'nhan' => $this->layNhanDoanhThu(),
             'thongbao' => Thongbao::orderByDesc('ngaydang')->limit(5)->get(), 'hopdongsaphethan' => $this->layHopDongSapHetHan(),
             'diennuocbathuong' => $this->layTieuThuBatThuong($t, $n),
@@ -81,8 +81,8 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
         $tienphong = []; $tiendichvu = [];
         for ($i = 5; $i >= 0; $i--) {
             $m = now()->subMonths($i); $t = (int)$m->month; $n = (int)$m->year;
-            $tienphong[] = (int)Hoadon::where('thang', $t)->where('nam', $n)->where('trangthaithanhtoan', 'Đã thanh toán')->sum('tienphong');
-            $tiendichvu[] = (int)Hoadon::where('thang', $t)->where('nam', $n)->where('trangthaithanhtoan', 'Đã thanh toán')->sum('tiendien') + (int)Hoadon::where('thang', $t)->where('nam', $n)->where('trangthaithanhtoan', 'Đã thanh toán')->sum('tiennuoc');
+            $tienphong[] = (int)Hoadon::where('thang', $t)->where('nam', $n)->where('trangthaithanhtoan', InvoiceStatus::Paid->value)->sum('tienphong');
+            $tiendichvu[] = (int)Hoadon::where('thang', $t)->where('nam', $n)->where('trangthaithanhtoan', InvoiceStatus::Paid->value)->sum('tiendien') + (int)Hoadon::where('thang', $t)->where('nam', $n)->where('trangthaithanhtoan', InvoiceStatus::Paid->value)->sum('tiennuoc');
         }
         return ['tienphong' => $tienphong, 'tiendichvu' => $tiendichvu];
     }

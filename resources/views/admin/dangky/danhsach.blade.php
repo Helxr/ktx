@@ -68,7 +68,7 @@
                             </td>
                             <td class="px-6 py-5 text-center">
                                 @php
-                                    $statusEnum = \App\Enums\RegistrationStatus::from($dangky->trangthai);
+                                    $statusEnum = $dangky->trangthai;
                                     $badgeClass = match ($statusEnum) {
                                         \App\Enums\RegistrationStatus::Approved, \App\Enums\RegistrationStatus::Completed => 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20',
                                         \App\Enums\RegistrationStatus::ApprovedPendingPayment => 'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10',
@@ -78,7 +78,7 @@
                                     };
                                 @endphp
                                 <span class="inline-flex items-center rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider {{ $badgeClass }}">
-                                    {{ $dangky->trangthai }}
+                                    {{ $statusEnum->label() }}
                                 </span>
                                 @if($dangky->expires_at && $dangky->trangthai === \App\Enums\RegistrationStatus::ApprovedPendingPayment->value)
                                     <div class="mt-1.5 text-[9px] font-bold text-rose-500 uppercase tracking-tighter tabular-nums">

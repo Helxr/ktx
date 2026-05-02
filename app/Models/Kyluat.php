@@ -19,6 +19,10 @@ class Kyluat extends Model
         'mucdo',
     ];
 
+    protected $casts = [
+        'mucdo' => \App\Enums\DisciplineLevel::class,
+    ];
+
     public function sinhvien(): BelongsTo
     {
         return $this->belongsTo(Sinhvien::class, 'sinhvien_id');

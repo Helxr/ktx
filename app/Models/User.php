@@ -14,12 +14,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    public const ROLE_ADMIN = 'admin';
-    public const ROLE_ADMIN_TRUONG = 'admin_truong';
-    public const ROLE_ADMIN_TOA_NHA = 'admin_toanha';
-    public const ROLE_LE_TAN = 'le_tan';
-    public const ROLE_SINH_VIEN = 'sinhvien';
-    public const ROLE_EX_STUDENT = 'cuu_sinhvien';
 
     /**
      * Chuyển sinh viên sang trạng thái Cựu sinh viên (Read-only access)
@@ -27,7 +21,7 @@ class User extends Authenticatable
     public function moveToExStudent(): bool
     {
         return $this->update([
-            'vaitro' => self::ROLE_EX_STUDENT,
+            'vaitro' => \App\Enums\UserRole::CuuSinhVien,
             'is_active' => true // Still active to allow login
         ]);
     }
@@ -65,6 +59,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'is_active' => 'boolean',
+        'vaitro' => \App\Enums\UserRole::class,
     ];
 
     /**
@@ -77,17 +72,22 @@ class User extends Authenticatable
 
     public function hasAnyRole(array $roles): bool
     {
-        return in_array($this->vaitro, $roles, true);
+        $currentRole = $this->vaitro instanceof \App\Enums\UserRole 
+            ? $this->vaitro->value 
+            : (string) $this->vaitro;
+
+        return collect($roles)->map(fn($role) => $role instanceof \App\Enums\UserRole ? $role->value : (string)$role)
+            ->contains($currentRole);
     }
 
     public function isAdminGroup(): bool
     {
-        return $this->hasAnyRole([
-            self::ROLE_ADMIN,
-            self::ROLE_ADMIN_TRUONG,
-            self::ROLE_ADMIN_TOA_NHA,
-            self::ROLE_LE_TAN,
-        ]);
+        $role = $this->vaitro;
+        if ($role instanceof \App\Enums\UserRole) {
+            return $role->isAdminGroup();
+        }
+        
+        return in_array((string)$role, ['admin', 'admin_truong', 'admin_toanha', 'le_tan'], true);
     }
 
     /**
