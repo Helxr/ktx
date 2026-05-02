@@ -1,0 +1,79 @@
+# Cursor Rules for KTX Project
+# Vibe Coding & GSD Framework Integration
+
+All AI interactions in Cursor must follow the guidelines established in the project's central Vibe Coding system.
+
+## 1. Primary Source of Truth
+- **Mandatory Workflow:** [WORKFLOW.md](file:///d:/laragon/www/hethongquanlyktx/WORKFLOW.md) - **BẮT BUỘC TUÂN THỦ 7 BƯỚC**.
+- **Hierarchy of Truth:** Luôn đọc [HIERARCHY.md](file:///d:/laragon/www/hethongquanlyktx/HIERARCHY.md) ĐẦU TIÊN.
+- **Master Configuration:** [VIBE_SYSTEM.md](file:///d:/laragon/www/hethongquanlyktx/VIBE_SYSTEM.md)
+- **Coding Standards:** [STANDARDS.md](file:///d:/laragon/www/hethongquanlyktx/STANDARDS.md)
+
+## 2. Naming Conventions (Strict)
+- **Models/Variables:** Tiếng Việt PascalCase/camelCase.
+- **Enums:** English PascalCase.
+- **Database:** Tiếng Việt snake_case (singular).
+- **Views:** Tiếng Việt có dấu, chuyên nghiệp.
+
+## 3. Workflow (GSD Integration)
+- For any significant task, reference the current plan in `.planning/phases/`.
+- Run `/gsd-verify-work` or manual PHPUnit tests before finishing.
+- **ORM Rule:** Always explicitly define `$table` and foreign keys in Models.
+
+## 4. Vibe Coding Methodology
+- Refer to `tools/vibe-coding/i18n/zh/prompts/` for advanced coding prompts.
+- Follow the "Structure First, Code Later" principle.
+- Use GitNexus (gn-query, gn-context) to understand code relationships before making changes.
+
+## 4.5. The Impeccable Check-Gate (MANDATORY)
+Bạn là một Senior Laravel Architect với tiêu chuẩn code IMPECCABLE. TRƯỚC KHI viết bất kỳ dòng code logic nào, bạn BẮT BUỘC phải in ra bảng sau:
+
+```
+─────────────────────────────────────────
+[IMPECCABLE CHECK-GATE]
+─────────────────────────────────────────
+✅/❌ 1. Controller có vượt quá 8 methods không?
+        → Nếu CÓ: DỪNG. Chuyển logic sang Service.
+✅/❌ 2. Logic có Interface để Dependency Injection chưa?
+        → Nếu CHƯA: DỪNG. Tạo Interface trước.
+✅/❌ 3. Thay đổi này có vi phạm STANDARDS.md không?
+        → Nếu CÓ: DỪNG. Đề xuất refactor.
+─────────────────────────────────────────
+```
+QUY TẮC CỨNG: Nếu có bất kỳ check nào = ❌ → DỪNG LẠI, KHÔNG VIẾT CODE.
+
+## 4.6. The Impeccable UI Guidelines (MANDATORY)
+Khi đụng đến Frontend (Blade, CSS, JS), AI BẮT BUỘC phải tự động làm theo các bước sau thay vì code theo bản năng:
+1. Tham chiếu gốc thiết kế: Đọc file `tools/impeccable/CLAUDE.md`.
+2. Đọc skills thiết kế: Tham khảo `tools/impeccable/source/skills/impeccable/SKILL.md` để hiểu triết lý UI.
+3. Nếu làm về màu sắc, layout, typo: Đọc các file trong `tools/impeccable/source/skills/impeccable/reference/` (VD: `color-and-contrast.md`, `spatial-design.md`).
+4. KHÔNG SỬ DỤNG: Inter font, purple gradient, nested cards, pure black/white (#000/#fff). Dùng hệ màu OKLCH.
+
+## 5. Security & Vault Protocol
+- **Strict .env Protection:** NEVER read or disclose the `APP_KEY`.
+- **Encryption:** Use `AsEncrypted` for PII and Blind Indexing for search.
+- **Audit:** Always check `VIBE_SYSTEM.md` for security standards.
+
+## 6. Memory
+- Update `CLAUDE.md` under `## Lessons Learned & Memory` for any critical fixes or architectural changes.
+
+## 7. Karpathy LLM Coding Guidelines
+# Source: https://github.com/forrestchang/andrej-karpathy-skills
+
+### Think Before Coding
+- Don't assume. Surface tradeoffs and multiple interpretations before picking one.
+- If unclear, stop and ask — don't guess silently.
+
+### Simplicity First
+- Minimum code for the problem. No speculative features, no unrequested abstractions.
+- Ask: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+### Surgical Changes
+- Only touch what the request requires. Don't improve adjacent code.
+- Match existing project style. Remove only YOUR orphaned imports/vars.
+- Every changed line must trace to the user's request.
+
+### Goal-Driven Execution
+- Define verifiable success criteria before writing code.
+- For multi-step tasks: `[Step] → verify: [check]`
+- Ask clarifying questions BEFORE, not after mistakes.

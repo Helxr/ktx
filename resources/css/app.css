@@ -1,0 +1,205 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@100..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        /* PDU Brand Colors (OKLCH) */
+        --brand-emerald-lch: 0.626 0.18 165;
+        --brand-jade-lch: 0.725 0.15 155;
+
+        /* UI Colors - Editorial Standard (tinted toward hue 165) */
+        --ui-bg-lch: 0.975 0.005 165;
+        --ui-card-lch: 0.995 0.003 165;
+        --ui-border-lch: 0.91 0.01 165;
+        --ui-muted-lch: 0.94 0.008 165;
+
+        /* Typography Colors (tinted neutrals) */
+        --ink-primary-lch: 0.18 0.015 165;
+        --ink-secondary-lch: 0.45 0.02 165;
+
+        /* Functional Status */
+        --success-lch: 0.72 0.15 150;
+        --warning-lch: 0.78 0.15 80;
+        --error-lch: 0.62 0.18 25;
+
+        /* Semantic Variables for Direct CSS usage */
+        --ui-bg: oklch(var(--ui-bg-lch));
+        --ui-card: oklch(var(--ui-card-lch));
+        --ink-primary: oklch(var(--ink-primary-lch));
+        --brand-emerald: oklch(var(--brand-emerald-lch));
+
+        /* Spacing scale (4pt) */
+        --space-xs: 4px;
+        --space-sm: 8px;
+        --space-md: 16px;
+        --space-lg: 24px;
+        --space-xl: 32px;
+        --space-2xl: 48px;
+        --space-3xl: 64px;
+        --space-4xl: 96px;
+    }
+
+    html {
+        @apply scroll-smooth;
+    }
+
+    body {
+        font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+        background-color: var(--ui-bg);
+        color: var(--ink-primary);
+        @apply antialiased;
+    }
+
+    ::selection {
+        background-color: oklch(var(--brand-emerald-lch) / 0.15);
+        color: var(--ink-primary);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Quicksand', sans-serif;
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -0.04em;
+        color: var(--ink-primary);
+    }
+
+    .font-display {
+        font-family: 'Quicksand', sans-serif;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@layer components {
+    /* ── Shell ── */
+    .pdu-shell {
+        background-color: var(--ui-bg);
+        color: var(--ink-primary);
+        @apply min-h-screen;
+    }
+
+    /* ── Card – no glassmorphism, no nested structure ── */
+    .pdu-card {
+        background-color: var(--ui-card);
+        border: 1px solid oklch(var(--ui-border-lch));
+        box-shadow: 0 1px 3px oklch(0.18 0.015 165 / 0.04);
+        @apply rounded-2xl p-5 transition-shadow duration-200 ease-out;
+    }
+    .pdu-card:hover {
+        box-shadow: 0 8px 24px oklch(0.18 0.015 165 / 0.08);
+    }
+
+    /* ── Buttons – ease-out, no bounce ── */
+    .pdu-btn-primary {
+        background-color: var(--brand-emerald);
+        color: oklch(0.995 0.003 165);
+        @apply inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-200 ease-out;
+    }
+    .pdu-btn-primary:hover {
+        background-color: oklch(var(--brand-jade-lch));
+        box-shadow: 0 4px 16px oklch(var(--brand-emerald-lch) / 0.25);
+        transform: translateY(-1px);
+    }
+
+    .pdu-btn-ghost {
+        background-color: transparent;
+        color: var(--ink-primary);
+        border: 1px solid oklch(var(--ui-border-lch));
+        @apply inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-200 ease-out;
+    }
+    .pdu-btn-ghost:hover {
+        background-color: oklch(var(--ui-muted-lch));
+        border-color: oklch(var(--ink-secondary-lch) / 0.2);
+    }
+
+    /* ── Form inputs (landing-compatible) ── */
+    .pdu-input {
+        @apply w-full rounded-xl border px-4 py-3 text-sm font-medium transition-colors duration-150 ease-out;
+        border-color: oklch(var(--ui-border-lch));
+        background-color: oklch(var(--ui-card-lch));
+        color: var(--ink-primary);
+    }
+    .pdu-input::placeholder {
+        color: oklch(var(--ink-secondary-lch) / 0.6);
+    }
+    .pdu-input:focus {
+        border-color: oklch(var(--brand-emerald-lch));
+        box-shadow: 0 0 0 3px oklch(var(--brand-emerald-lch) / 0.1);
+        outline: none;
+    }
+
+    .pdu-select {
+        @apply pdu-input appearance-none cursor-pointer pr-10;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24' stroke='%23666'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+    }
+
+    /* ── Chip/Badge ── */
+    .pdu-chip {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold;
+        background-color: oklch(var(--ui-muted-lch));
+        color: oklch(var(--ink-secondary-lch));
+    }
+
+    /* ── Portal sidebar (admin) ── */
+    .portal-sidebar {
+        background-color: var(--ui-card);
+        border-right-color: oklch(var(--ui-border-lch));
+        @apply fixed inset-y-0 left-0 z-40 hidden w-64 border-r lg:block;
+    }
+
+    .portal-link {
+        @apply mt-1.5 flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold text-ink-secondary transition-all duration-200 ease-out hover:bg-ui-bg hover:text-ink-primary;
+    }
+
+    .portal-link-active {
+        background-color: var(--ui-bg);
+        color: var(--brand-emerald);
+        @apply ring-1 ring-brand-emerald/10;
+    }
+
+    .portal-badge {
+        @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold;
+    }
+
+    .portal-badge-success {
+        @apply portal-badge bg-status-success/10 text-status-success;
+    }
+}
+
+/* ── Landing page specific ── */
+@layer utilities {
+    .landing-section {
+        @apply py-20 lg:py-28;
+    }
+
+    .landing-container {
+        @apply mx-auto max-w-7xl px-6 lg:px-12;
+    }
+
+    /* Sweep animation for filtered cards – ease-out only */
+    @keyframes sweep {
+        0% { opacity: 0; transform: translateY(12px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-sweep {
+        animation: sweep 0.35s ease-out forwards;
+    }
+
+    /* Stagger entrance for sections */
+    @keyframes fade-in-up {
+        0% { opacity: 0; transform: translateY(16px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in-up {
+        animation: fade-in-up 0.5s ease-out forwards;
+    }
+}

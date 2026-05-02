@@ -1,0 +1,304 @@
+# Windsurf Rules for KTX Project
+# Quản lý Ký túc xá - GSD + Impeccable Integration
+# Ref: STANDARDS.md (Tiếng Việt cho Models/Variables, Tiếng Anh cho Enums)
+
+## Tools Setup
+
+### GSD (Get Shit Done) - Task Management
+**Location:** `tools/gsd/`
+**Install:** `npx get-shit-done-cc@latest --windsurf --local`
+
+**Key Commands for KTX:**
+- `/gsd-new-project` - Khởi tạo dự án KTX mới
+- `/gsd-discuss-phase [N]` - Thảo luận trước khi lập kế hoạch
+- `/gsd-plan-phase [N]` - Lập kế hoạch cho phase
+- `/gsd-execute-phase [N]` - Thực thi các task
+- `/gsd-verify-work [N]` - Kiểm tra chất lượng
+- `/gsd-quick [--research]` - Task nhanh không cần full plan
+- `/gsd-next` - Tự động chuyển step tiếp theo
+
+**Workflow cho KTX:**
+1. Dùng `/gsd-new-project` để tạo cấu trúc quản lý KTX
+2. Mỗi module (Sinhvien, Phong, Hopdong) = 1 phase
+3. Luôn chạy `/gsd-verify-work` trước khi ship
+4. Dùng `/gsd-quick --research` cho bug fixes nhanh
+
+**Naming theo STANDARDS.md:**
+- Plans: Tiếng Việt (VD: `01-quan-ly-sinh-vien/`)
+- Không dùng Tiếng Anh trong file plan (tránh trùng `Student` vs `Sinhvien`)
+
+### GitNexus - Code Intelligence & Knowledge Graph
+**Location:** `tools/gitnexus/`
+**Type:** Node.js/TypeScript CLI + MCP Server
+**Install:** `cd tools/gitnexus/gitnexus && npm install && npm run build`
+
+**Key Commands for KTX:**
+```bash
+# Index codebase (chạy 1 lần đầu)
+npx gitnexus index
+
+# Serve MCP server (cho AI agents)
+npx gitnexus serve
+
+# Query knowledge graph
+npx gitnexus query "find auth logic"
+npx gitnexus context SinhvienController
+```
+
+**MCP Integration Windsurf:**
+File `.mcp.json` đã tạo tại thư mục gốc:
+```json
+{
+  "mcpServers": {
+    "gitnexus": {
+      "command": "gitnexus",
+      "args": ["serve"],
+      "env": {
+        "GITNEXUS_PORT": "4747",
+        "GITNEXUS_REPO_PATH": "d:\\laragon\\www\\hethongquanlyktx"
+      }
+    }
+  }
+}
+```
+
+**Chạy server:**
+```bash
+gitnexus serve  # Chạy tại localhost:4747
+```
+
+**Re-index khi codebase thay đổi:**
+```bash
+gitnexus analyze  # Index lại toàn bộ codebase
+```
+
+### Impeccable - UI Testing & Design
+**Location:** `tools/impeccable/`
+**CLI:** `npx impeccable detect [path]`
+
+**Luật Thiết Kế BẮT BUỘC:**
+- AI **PHẢI ĐỌC** các quy tắc tại thư mục `tools/impeccable/source/skills/` TRƯỚC KHI thiết kế hoặc chỉnh sửa bất kỳ giao diện nào.
+- Tham khảo file cấu hình lõi: `tools/impeccable/CLAUDE.md`.
+- Thay vì dùng lệnh global `/impeccable`, AI sẽ tự động đọc `tools/impeccable/source/skills/impeccable/SKILL.md` và các tài liệu reference (typography, color-and-contrast, layout) tương ứng với nhu cầu của user để có kiến thức về thiết kế.
+
+**Key Concepts for KTX:**
+- `audit` - Kiểm tra UI (a11y, performance, responsive)
+- `polish` - Hoàn thiện trước khi deploy
+- `critique` - UX review
+- `normalize` - Sửa inconsistencies
+
+**CLI Usage cho Blade Views:**
+```bash
+npx impeccable detect resources/views/admin/        # Scan admin views
+npx impeccable detect resources/views/sinhvien/     # Scan student views
+npx impeccable detect public/css/                     # Scan CSS files
+```
+
+**Anti-patterns check:**
+- Không dùng Inter font mặc định
+- Không nested cards
+- Không gray text trên colored background
+- Dark mode: dùng tinted neutrals (OKLCH)
+
+## Project Structure Integration
+
+```
+d:\laragon\www\hethongquanlyktx/
+├── .windsurfrules              # File này
+├── STANDARDS.md                # Quy chuẩn đặt tên
+├── .planning/                  # GSD planning artifacts
+│   ├── PROJECT.md
+│   ├── REQUIREMENTS.md
+│   ├── ROADMAP.md
+│   ├── STATE.md
+│   └── phases/                 # Phase directories
+├── app/                        # Laravel Backend
+│   ├── Models/                 # PascalCase + Tiếng Việt
+│   ├── Http/Controllers/       # PascalCase + Controller
+│   └── Observers/
+├── resources/views/            # Blade Frontend
+│   ├── admin/                  # kebab-case folders
+│   └── sinhvien/
+├── tools/                      # External tools
+│   ├── gsd/                    # Task management
+│   ├── impeccable/             # UI testing
+│   └── gitnexus/               # Code intelligence (Node.js/TypeScript)
+│       └── gitnexus/           # CLI + MCP server
+├── tests/                      # Test suites
+└── public/                     # Assets
+```
+
+## Development Workflow
+
+### Starting New Feature (KTX Module)
+1. `/gsd-discuss-phase N` - Capture yêu cầu
+2. `/gsd-plan-phase N` - Research + create plans
+3. `/gsd-execute-phase N` - Implement
+4. `/audit resources/views/[module]/` - Check UI
+5. `/gsd-verify-work N` - Test functionality
+6. `/polish [module]` - Final UI polish
+
+**Workflow cho KTX với GitNexus:**
+1. Dùng `/gsd-new-project` để tạo cấu trúc quản lý KTX
+2. Mỗi module (Sinhvien, Phong, Hopdong) = 1 phase
+3. Luôn chạy `/gsd-verify-work` trước khi ship
+4. Dùng `/gsd-quick --research` cho bug fixes nhanh
+
+**Alias GitNexus (PowerShell):**
+Thêm vào `$PROFILE`:
+```powershell
+# GitNexus aliases
+function gitnexus-index { npx gitnexus index }
+function gitnexus-serve { npx gitnexus serve }
+function gitnexus-query { npx gitnexus query $args }
+function gitnexus-context { npx gitnexus context $args }
+function gitnexus-status { npx gitnexus status }
+
+Set-Alias gn-index gitnexus-index
+Set-Alias gn-serve gitnexus-serve
+Set-Alias gn-query gitnexus-query
+Set-Alias gn-context gitnexus-context
+Set-Alias gn-status gitnexus-status
+```
+
+### Bug Fix / Hotfix
+```
+/gsd-quick --research "Fix lỗi [mô tả]"
+```
+
+## Integrated Workflow (GSD + GitNexus + Impeccable)
+
+### Full Feature Development Workflow
+**Sử dụng skill:** `.windsurf/skills/ktx-integration/SKILL.md`
+
+**Phase 1: Discovery (GitNexus)**
+```bash
+gitnexus query "tìm hiểu về [module]"
+gitnexus_context [symbol_name]
+gitnexus_impact({target: "symbolName", direction: "upstream"})
+```
+
+**Phase 2: Planning (GSD)**
+```bash
+/gsd-discuss-phase [N]
+/gsd-plan-phase [N]
+```
+
+**Phase 3: Implementation (GSD + GitNexus)**
+```bash
+/gsd-execute-phase [N]
+# Trước khi sửa: gitnexus_impact
+# Sau khi sửa: gitnexus_detect_changes
+```
+
+**Phase 4: UI Verification (Impeccable)**
+```bash
+# Tham chiếu các file trong `tools/impeccable/source/skills/impeccable/reference/` để đối chiếu rules
+npx impeccable detect resources/views/[module]/
+```
+
+**Phase 5: Final Verification (Tất cả 3)**
+```bash
+/gsd-verify-work [N]
+gitnexus_detect_changes()
+impeccable detect resources/views/ --fast
+```
+
+**Phase 6: Memory Update**
+```bash
+# Cập nhật CLAUDE.md nếu gặp lỗi mới
+```
+
+### Quick Commands
+```bash
+# Full feature workflow
+ktx-feature [module-name]
+
+# Debug workflow
+ktx-debug [mô tả lỗi]
+
+# Refactor workflow
+ktx-refactor [symbol-name]
+
+# Deploy workflow
+ktx-deploy
+```
+
+### Pre-Deploy Checklist
+```bash
+# 1. Run GSD verify
+/gsd-verify-work [phase]
+
+# 2. Run Impeccable audit
+npx impeccable detect resources/views/ --fast
+
+# 3. Check STANDARDS compliance
+# - Models: Tiếng Việt PascalCase
+# - Enums: Tiếng Anh PascalCase
+# - Views: Tiếng Việt có dấu
+```
+
+## Naming Conventions (from STANDARDS.md)
+
+| Component | Format | Example |
+|-----------|--------|---------|
+| Controllers | PascalCase + Controller | `SinhvienController` |
+| Models | **Tiếng Việt** PascalCase | `Sinhvien`, `Phong`, `Hopdong` |
+| Variables | **Tiếng Việt** camelCase | `$tuKhoa`, `$danhSachPhong` |
+| DB Tables | **Tiếng Việt** snake_case | `sinhvien`, `phong` |
+| Enums | **Tiếng Anh** PascalCase | `ContractStatus`, `RegistrationType` |
+| Views | kebab-case | `admin/sinhvien/danhsach.blade.php` |
+
+## AI Agent Guidelines
+
+0. **Follow WORKFLOW.md (7 Steps)** - BẮT BUỘC tuân thủ lộ trình 7 bước trước khi thực hiện bất kỳ thay đổi nào.
+1. **Read HIERARCHY.md First** - Nắm rõ phân cấp quyền lực tri thức.
+2. **Always read STANDARDS.md first** - Understand naming conventions
+2. **Use GSD for complex tasks** - Anything > 1 hour of work
+3. **Run Impeccable on UI changes** - Before committing frontend code
+4. **Mix Vietnamese for business logic** - Tiếng Anh chỉ cho Enums
+5. **Check for duplicates** - Run `gitnexus_query` trước khi tạo class mới
+6. **Update Permanent Memory** - Mỗi khi giải quyết xong một lỗi hệ thống phức tạp, một lỗi logic khó, hoặc thực hiện một thay đổi kiến trúc quan trọng, bạn BẮT BUỘC phải cập nhật vào mục `## Lessons Learned & Memory` trong `CLAUDE.md`. Định dạng: `[Ngày] | [Vấn đề] | [Nguyên nhân] | [Giải pháp & Cách phòng ngừa]`
+7. **The Impeccable Check-Gate (MANDATORY):**
+   TRƯỚC KHI viết code logic, bạn BẮT BUỘC in ra bảng sau và tự đánh giá:
+   `[IMPECCABLE CHECK-GATE]`
+   `1. Controller > 8 methods? (Có -> Dừng, sang Service)`
+   `2. Có Interface cho Service chưa? (Chưa -> Dừng, tạo Interface)`
+   `3. Vi phạm STANDARDS.md? (Có -> Dừng, refactor)`
+   Nếu có bất kỳ check ❌ nào -> TỪ CHỐI VIẾT CODE và yêu cầu refactor. Chỉ code khi 100% ✅.
+
+## Vibe Coding Integration (from vibe-coding-cn)
+**Source of Truth:** [VIBE_SYSTEM.md](file:///d:/laragon/www/hethongquanlyktx/VIBE_SYSTEM.md)
+**Resources:** `tools/vibe-coding/`
+
+**Key Principles:**
+- Follow Recursive Self-Optimization (α-generator, Ω-optimizer).
+- Use modular prompts from `tools/vibe-coding/i18n/zh/prompts/coding_prompts`.
+- Enforce "Structure First" using GSD planning.
+
+## Security & Vault Protocol
+- **Strict .env Protection:** NEVER read or disclose the `APP_KEY`.
+- **Command Guard:** Always check `VIBE_SYSTEM.md` before suggesting `migrate:fresh` or `key:generate`.
+- **Audit Requirement:** Every PR/Phase involving PII or Finances MUST pass `gsd-security-audit`.
+
+## Karpathy LLM Coding Guidelines
+# Source: https://github.com/forrestchang/andrej-karpathy-skills
+
+### Think Before Coding
+- Don't assume. Surface tradeoffs and multiple interpretations before picking one.
+- If unclear, stop and ask — don't guess silently.
+- Push back when a simpler approach exists.
+
+### Simplicity First
+- Minimum code for the problem. No speculative features, no unrequested abstractions.
+- Ask: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+### Surgical Changes
+- Only touch what the request requires. Don't improve adjacent code.
+- Match existing project style. Remove only YOUR orphaned imports/vars.
+- Every changed line must trace to the user's request.
+
+### Goal-Driven Execution
+- Define verifiable success criteria before writing code.
+- For multi-step tasks: `[Step] → verify: [check]`
+- Ask clarifying questions BEFORE, not after mistakes.

@@ -1,0 +1,10 @@
+﻿
+storage\logs\laravel.log:5465:[2026-04-28 03:59:32] local.ERROR: Registration failed: Failed to authenticate on SMTP 
+server with username "your_username_here" using the following authenticators: "CRAM-MD5", "LOGIN", "PLAIN". 
+Authenticator "CRAM-MD5" returned "Expected response code "235" but got code "535", with message "535 5.7.0 Invalid 
+credentials".". Authenticator "LOGIN" returned "Expected response code "334" but got empty code.". Authenticator 
+"PLAIN" returned "Expected response code "235" but got empty code.". {"stack":"#0 
+D:\\laragon\\www\\hethongquanlyktx\\vendor\\symfony\\mailer\\Transport\\Smtp\\EsmtpTransport.php(161): 
+Symfony\\Component\\Mailer\\Transport\\Smtp\\EsmtpTransport->handleAuth(Array)
+
+

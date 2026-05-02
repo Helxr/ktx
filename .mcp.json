@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "gitnexus": {
+      "command": "gitnexus",
+      "args": ["serve"],
+      "env": {
+        "GITNEXUS_PORT": "4749",
+        "GITNEXUS_REPO_PATH": "d:\\laragon\\www\\hethongquanlyktx"
+      }
+    }
+  }
+}
