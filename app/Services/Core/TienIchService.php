@@ -6,10 +6,13 @@ use App\Contracts\Core\TienIchServiceInterface;
 use App\Models\Cauhinh;
 use App\Models\Lienhe;
 use App\Models\Thongbao;
+use App\Traits\ThoatKyTuLike;
 use Illuminate\Http\Request;
 
 class TienIchService implements TienIchServiceInterface
 {
+    use ThoatKyTuLike;
+
     public function layCauHinh(): array
     {
         return Cauhinh::all()->pluck('giatri', 'ten')->toArray();
@@ -49,10 +52,11 @@ class TienIchService implements TienIchServiceInterface
 
         $query = Lienhe::query()
             ->when($tuKhoa !== '', function ($q) use ($tuKhoa) {
-                $q->where(function ($sub) use ($tuKhoa) {
-                    $sub->where('ho_ten', 'like', "%{$tuKhoa}%")
-                        ->orWhere('email', 'like', "%{$tuKhoa}%")
-                        ->orWhere('noi_dung', 'like', "%{$tuKhoa}%");
+                $escapedTuKhoa = $this->thoatKyTuLike($tuKhoa);
+                $q->where(function ($sub) use ($escapedTuKhoa) {
+                    $sub->where('ho_ten', 'like', "%{$escapedTuKhoa}%")
+                        ->orWhere('email', 'like', "%{$escapedTuKhoa}%")
+                        ->orWhere('noi_dung', 'like', "%{$escapedTuKhoa}%");
                 });
             })
             ->when($trangThai !== 'tatca', fn ($q) => $q->where('trang_thai', $trangThai))

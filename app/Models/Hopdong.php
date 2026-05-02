@@ -19,6 +19,16 @@ class Hopdong extends Model
         return \App\Enums\ContractStatus::Active->value;
     }
 
+    public static function trangThaiDaThanhLy(): string
+    {
+        return \App\Enums\ContractStatus::Terminated->value;
+    }
+
+    public static function trangThaiHetHan(): string
+    {
+        return \App\Enums\ContractStatus::Expired->value;
+    }
+
 
     private const ALLOWED_TRANSITIONS = [
         'active' => [

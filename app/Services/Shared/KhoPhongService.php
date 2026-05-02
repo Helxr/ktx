@@ -16,7 +16,8 @@ class KhoPhongService implements KhoPhongServiceInterface
         $toa = $request->query('toa', 'A');
         $tang = (int) $request->query('tang', 1);
 
-        $danhsachphong = Phong::where('tenphong', 'like', $toa . '%')->where('tang', $tang)->orderBy('tenphong')->get();
+        $escapedToa = str_replace(['%', '_'], ['\%', '\_'], $toa);
+        $danhsachphong = Phong::where('tenphong', 'like', $escapedToa . '%')->where('tang', $tang)->orderBy('tenphong')->get();
         $phongIds = $danhsachphong->pluck('id');
 
         $allSinhvien = Sinhvien::whereIn('phong_id', $phongIds)->with('taikhoan')->get()->groupBy('phong_id');

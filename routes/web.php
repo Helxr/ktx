@@ -18,14 +18,14 @@ use App\Http\Controllers\Shared\ProfileController;
 // --------------------------------------------------------------------------
 Route::namespace('App\Http\Controllers\Guest')->group(function () {
     Route::get('/', 'LandingController@index')->name('home');
-    Route::post('/lien-he', 'LandingController@guiLienHe')->name('landing.lienhe');
+    Route::post('/lien-he', 'LandingController@guiLienHe')->middleware('throttle:5,1')->name('landing.lienhe');
 
     // Guest Registration & Lookup
     Route::prefix('dang-ky-ktx')->name('guest.dangky.')->group(function () {
         Route::get('/', 'DangkyController@create')->name('create');
-        Route::post('/', 'DangkyController@store')->name('store');
+        Route::post('/', 'DangkyController@store')->middleware('throttle:5,1')->name('store');
     });
-    Route::get('/tra-cuu-don/{token?}', 'DangkyController@lookup')->name('guest.lookup');
+    Route::get('/tra-cuu-don/{token?}', 'DangkyController@lookup')->middleware('throttle:10,1')->name('guest.lookup');
 
     // Public Room Info
     Route::prefix('phong')->name('public.')->group(function () {

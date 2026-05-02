@@ -8,17 +8,19 @@ use App\Models\Hopdong;
 use App\Models\Phong;
 use App\Models\Sinhvien;
 use App\Traits\PhanHoiService;
+use App\Traits\ThoatKyTuLike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class SinhvienService implements SinhvienServiceInterface
 {
-    use PhanHoiService;
+    use PhanHoiService, ThoatKyTuLike;
 
     public function listStudents(Request $request): array
     {
         $tuKhoa = $request->query('q', '');
-        $students = Sinhvien::when($tuKhoa, fn($q) => $q->where('masinhvien', 'like', '%'.trim($tuKhoa).'%'))
+        $escapedTuKhoa = $this->thoatKyTuLike(trim($tuKhoa));
+        $students = Sinhvien::when($tuKhoa, fn($q) => $q->where('masinhvien', 'like', '%'.$escapedTuKhoa.'%'))
             ->with(['taikhoan', 'phong'])
             ->orderByDesc('created_at')
             ->paginate(20)
@@ -75,6 +77,16 @@ class SinhvienService implements SinhvienServiceInterface
                 }
 
                 $sinhvien->update(['phong_id' => $phong->id]);
+
+                Hopdong::create([
+                    'sinhvien_id' => $sinhvien->id,
+                    'phong_id' => $phong->id,
+                    'ngay_bat_dau' => now()->toDateString(),
+                    'ngay_ket_thuc' => now()->addMonths(6)->toDateString(),
+                    'giaphong_luc_ky' => (int) $phong->giaphong,
+                    'trang_thai' => ContractStatus::Active->value,
+                ]);
+
                 return $this->traVeThanhCong('Chuyển phòng thành công.');
             });
         } catch (\Throwable $e) {

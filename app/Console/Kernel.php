@@ -13,6 +13,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('notifications:prune')->daily();
+        $schedule->command('hopdong:kiem-tra-het-han')->daily();
+        $schedule->command('hoadon:kiem-tra-qua-han')->daily();
     }
 
     /**

@@ -68,11 +68,11 @@
                             </td>
                             <td class="px-6 py-5">
                                 @php
-                                    $isPaid = $hoadon->trangthaithanhtoan === 'Đã thanh toán';
+                                    $isPaid = $hoadon->trangthaithanhtoan === \App\Enums\InvoiceStatus::Paid;
                                     $badgeClass = $isPaid ? 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20' : 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20';
                                 @endphp
                                 <span class="inline-flex items-center rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider {{ $badgeClass }}">
-                                    {{ $hoadon->trangthaithanhtoan }}
+                                    {{ $hoadon->trangthaithanhtoan->label() }}
                                 </span>
                             </td>
                             <td class="px-6 py-5 text-right">

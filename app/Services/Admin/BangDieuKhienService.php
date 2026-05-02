@@ -73,17 +73,35 @@ class BangDieuKhienService implements BangDieuKhienServiceInterface
 
     private function demPhongConTrong(): int
     {
-        return Phong::all()->filter(fn($p) => Sinhvien::where('phong_id', $p->id)->count() < (int)$p->succhuamax)->count();
+        return Phong::withCount('danhsachsinhvien')
+            ->get()
+            ->filter(fn($p) => $p->danhsachsinhvien_count < (int) $p->succhuamax)
+            ->count();
     }
 
     private function layXuHuongDoanhThu(): array
     {
-        $tienphong = []; $tiendichvu = [];
-        for ($i = 5; $i >= 0; $i--) {
-            $m = now()->subMonths($i); $t = (int)$m->month; $n = (int)$m->year;
-            $tienphong[] = (int)Hoadon::where('thang', $t)->where('nam', $n)->where('trangthaithanhtoan', InvoiceStatus::Paid->value)->sum('tienphong');
-            $tiendichvu[] = (int)Hoadon::where('thang', $t)->where('nam', $n)->where('trangthaithanhtoan', InvoiceStatus::Paid->value)->sum('tiendien') + (int)Hoadon::where('thang', $t)->where('nam', $n)->where('trangthaithanhtoan', InvoiceStatus::Paid->value)->sum('tiennuoc');
+        $cacThang = collect(range(5, 0))->map(fn($i) => now()->subMonths($i));
+
+        $ketQua = Hoadon::where('trangthaithanhtoan', InvoiceStatus::Paid->value)
+            ->where(function ($q) use ($cacThang) {
+                foreach ($cacThang as $m) {
+                    $q->orWhere(fn($sq) => $sq->where('thang', (int) $m->month)->where('nam', (int) $m->year));
+                }
+            })
+            ->selectRaw('thang, nam, SUM(tienphong) as tong_tienphong, SUM(COALESCE(tiendien, 0) + COALESCE(tiennuoc, 0)) as tong_tiendichvu')
+            ->groupBy('thang', 'nam')
+            ->get()
+            ->keyBy(fn($r) => $r->thang . '-' . $r->nam);
+
+        $tienphong = [];
+        $tiendichvu = [];
+        foreach ($cacThang as $m) {
+            $key = (int) $m->month . '-' . (int) $m->year;
+            $tienphong[] = (int) ($ketQua[$key]->tong_tienphong ?? 0);
+            $tiendichvu[] = (int) ($ketQua[$key]->tong_tiendichvu ?? 0);
         }
+
         return ['tienphong' => $tienphong, 'tiendichvu' => $tiendichvu];
     }
 

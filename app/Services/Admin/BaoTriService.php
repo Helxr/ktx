@@ -7,17 +7,19 @@ use App\Models\Lichsubaotri;
 use App\Models\Phong;
 use App\Models\Vattu;
 use App\Traits\PhanHoiService;
+use App\Traits\ThoatKyTuLike;
 use Illuminate\Http\Request;
 
 class BaoTriService implements BaoTriServiceInterface
 {
-    use PhanHoiService;
+    use PhanHoiService, ThoatKyTuLike;
 
     public function lietKeBaoTri(Request $request): array
     {
         $tuKhoa = $request->query('q', '');
         $data = Lichsubaotri::when($tuKhoa, function ($q) use ($tuKhoa) {
-            $q->whereHas('phong', fn($pq) => $pq->where('tenphong', 'like', "%{$tuKhoa}%"));
+            $escapedTuKhoa = $this->thoatKyTuLike($tuKhoa);
+            $q->whereHas('phong', fn($pq) => $pq->where('tenphong', 'like', "%{$escapedTuKhoa}%"));
         })->with(['phong', 'vattu'])->orderByDesc('ngaybaotri')->paginate(20);
 
         return [

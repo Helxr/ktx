@@ -14,7 +14,7 @@
 
     {{-- Trạng thái --}}
     <div class="mb-6">
-        @if($hoadon->trangthaithanhtoan === 'Đã thanh toán')
+        @if($hoadon->trangthaithanhtoan === \App\Enums\InvoiceStatus::Paid)
             <div class="rounded-lg bg-green-50 p-4 text-center">
                 <div class="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
                     <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
