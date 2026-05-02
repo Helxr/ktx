@@ -78,3 +78,8 @@ composer.lock
 package-lock.json
 *.log
 storage/
+ARCHITECTURE_REPORT.md
+AGENTS.md
+CLAUDE.md
+CRAFT_PROTOCOL.md
+HIERARCHY.md
