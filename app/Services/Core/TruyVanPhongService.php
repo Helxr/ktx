@@ -8,11 +8,12 @@ use App\Models\Sinhvien;
 use App\Models\Dangky;
 use App\Enums\RegistrationStatus;
 use App\Traits\PhanHoiService;
+use App\Traits\ThoatKyTuLike;
 use Illuminate\Http\Request;
 
 class TruyVanPhongService implements TruyVanPhongServiceInterface
 {
-    use PhanHoiService;
+    use PhanHoiService, ThoatKyTuLike;
 
     public function lietKePhongChoAdmin(Request $request): array
     {
@@ -20,9 +21,10 @@ class TruyVanPhongService implements TruyVanPhongServiceInterface
         $tangLoc = $request->query('tang', '');
         $viewMode = $request->query('view', 'table');
 
+        $escapedTuKhoa = $this->thoatKyTuLike(trim($tuKhoa));
         $danhsachphong = Phong::withCount('danhsachsinhvien')
-            ->when($tuKhoa, function ($query, $tuKhoa) {
-                return $query->where('tenphong', 'like', '%'.trim($tuKhoa).'%');
+            ->when($tuKhoa, function ($query) use ($escapedTuKhoa) {
+                return $query->where('tenphong', 'like', '%'.$escapedTuKhoa.'%');
             })
             ->when($tangLoc, function ($query) use ($tangLoc) {
                 return $query->where('tang', $tangLoc);
@@ -45,9 +47,10 @@ class TruyVanPhongService implements TruyVanPhongServiceInterface
         $tangLoc = $request->query('tang', '');
         $gioiTinhLoc = $request->query('gioitinh', '');
 
+        $escapedTuKhoaCK = $this->thoatKyTuLike(trim($tuKhoa));
         $danhsachphong = Phong::withCount('danhsachsinhvien')
-            ->when($tuKhoa, function ($query, $tuKhoa) {
-                return $query->where('tenphong', 'like', '%'.trim($tuKhoa).'%');
+            ->when($tuKhoa, function ($query) use ($escapedTuKhoaCK) {
+                return $query->where('tenphong', 'like', '%'.$escapedTuKhoaCK.'%');
             })
             ->when($tangLoc, function ($query) use ($tangLoc) {
                 return $query->where('tang', $tangLoc);
@@ -75,9 +78,10 @@ class TruyVanPhongService implements TruyVanPhongServiceInterface
         $sinhvien = Sinhvien::where('user_id', auth()->id())->first();
         $gioitinhSinhvien = optional($sinhvien?->taikhoan)->gioitinh ?? null;
 
+        $escapedTuKhoaSV = $this->thoatKyTuLike(trim($tuKhoa));
         $danhsachphong = Phong::withCount('danhsachsinhvien')
-            ->when($tuKhoa, function ($query, $tuKhoa) {
-                return $query->where('tenphong', 'like', '%'.trim($tuKhoa).'%');
+            ->when($tuKhoa, function ($query) use ($escapedTuKhoaSV) {
+                return $query->where('tenphong', 'like', '%'.$escapedTuKhoaSV.'%');
             })
             ->when($gioitinhSinhvien, function ($query) use ($gioitinhSinhvien) {
                 return $query->where('gioitinh', $gioitinhSinhvien);

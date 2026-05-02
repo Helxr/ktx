@@ -49,7 +49,7 @@
                             <td class="px-6 py-4 font-medium text-[#121212]">{{ $hoadon->thang }}/{{ $hoadon->nam }}</td>
                             <td class="px-6 py-4">{{ number_format($hoadon->tongtien) }} đ</td>
                             <td class="px-6 py-4">
-                                @if($hoadon->trangthaithanhtoan === 'Đã thanh toán')
+                                @if($hoadon->trangthaithanhtoan === \App\Enums\InvoiceStatus::Paid)
                                     <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">Đã thanh toán</span>
                                 @else
                                     <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-700">Chưa thanh toán</span>

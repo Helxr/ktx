@@ -91,18 +91,32 @@ class HoadonService implements HoadonServiceInterface
 
     public function xuLyHoaDon(array $data): array
     {
-        // Existing logic... (simplified for migration)
         $phong = Phong::find($data['phong_id']);
+        if (!$phong) {
+            return $this->traVeLoi('Không tìm thấy phòng.');
+        }
+
+        $hoaDonHienTai = Hoadon::where('phong_id', $data['phong_id'])
+            ->where('thang', $data['thang'])
+            ->where('nam', $data['nam'])
+            ->where('loai_hoadon', Hoadon::LOAI_MONTHLY)
+            ->first();
+
+        if ($hoaDonHienTai && $hoaDonHienTai->trangthaithanhtoan === InvoiceStatus::Paid) {
+            return $this->traVeLoi('Hóa đơn tháng này đã được thanh toán, không thể ghi đè.');
+        }
+
         $bangGia = $this->layBangGia();
-        
         $tiendien = ($data['chisodienmoi'] - $data['chisodiencu']) * $bangGia['dongiadien'];
         $tiennuoc = ($data['chisonuocmoi'] - $data['chisonuoccu']) * $bangGia['dongianuoc'];
-        $tongtien = $phong->giaphong + $tiendien + $tiennuoc;
+        $phidichvu = (int) $this->layGiaTuCauhinh('phi_dich_vu', '0');
+        $tongtien = $phong->giaphong + $tiendien + $tiennuoc + $phidichvu;
 
         $hoadon = Hoadon::updateOrCreate([
             'phong_id' => $data['phong_id'],
             'thang' => $data['thang'],
             'nam' => $data['nam'],
+            'loai_hoadon' => Hoadon::LOAI_MONTHLY,
         ], [
             'chisodiencu' => $data['chisodiencu'],
             'chisodienmoi' => $data['chisodienmoi'],
@@ -111,6 +125,7 @@ class HoadonService implements HoadonServiceInterface
             'tienphong' => $phong->giaphong,
             'tiendien' => $tiendien,
             'tiennuoc' => $tiennuoc,
+            'phidichvu' => $phidichvu,
             'tongtien' => $tongtien,
             'ngayxuat' => now()->format('Y-m-d'),
             'trangthaithanhtoan' => InvoiceStatus::Pending->value,

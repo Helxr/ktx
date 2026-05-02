@@ -13,6 +13,7 @@ use App\Models\Phong;
 use App\Models\Sinhvien;
 use App\Traits\HoTroNghiepVu;
 use App\Traits\PhanHoiService;
+use App\Traits\ThoatKyTuLike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -20,14 +21,15 @@ use Illuminate\Support\Facades\Event;
 
 class HopdongService implements HopdongServiceInterface
 {
-    use HoTroNghiepVu, PhanHoiService;
+    use HoTroNghiepVu, PhanHoiService, ThoatKyTuLike;
 
     public function lietKeHopDongAdmin(Request $request): array
     {
         $tuKhoa = $request->query('q', '');
         $trangThai = $request->query('trangthai', 'Tất cả');
         $contracts = Hopdong::when($tuKhoa, function ($q) use ($tuKhoa) {
-            $q->whereHas('sinhvien', fn($sq) => $sq->where('masinhvien', 'like', "%{$tuKhoa}%"));
+            $escapedTuKhoa = $this->thoatKyTuLike($tuKhoa);
+            $q->whereHas('sinhvien', fn($sq) => $sq->where('masinhvien', 'like', "%{$escapedTuKhoa}%"));
         })->when($trangThai !== 'Tất cả', function ($q) use ($trangThai) {
             $q->where('trang_thai', $trangThai);
         })->with(['sinhvien.taikhoan', 'phong'])->orderByDesc('created_at')->paginate(20);

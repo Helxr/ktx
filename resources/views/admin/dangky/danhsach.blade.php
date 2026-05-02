@@ -63,7 +63,7 @@
                                     @if($dangky->giuong_no)
                                         <span class="text-[10px] font-bold uppercase tracking-[0.1em] text-ink-secondary/60">Giường #{{ $dangky->giuong_no }}</span>
                                     @endif
-                                    <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-brand-emerald/80">{{ $dangky->loaidangky }}</span>
+                                    <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-brand-emerald/80">{{ $dangky->loaidangky->label() }}</span>
                                 </div>
                             </td>
                             <td class="px-6 py-5 text-center">

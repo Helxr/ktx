@@ -7,11 +7,12 @@ use App\Models\Hoadon;
 use App\Models\Phong;
 use App\Models\Thongbao;
 use App\Traits\PhanHoiService;
+use App\Traits\ThoatKyTuLike;
 use Illuminate\Http\Request;
 
 class TaiChinhService implements TaiChinhServiceInterface
 {
-    use PhanHoiService;
+    use PhanHoiService, ThoatKyTuLike;
 
     public function lietKeCongNo(Request $request): array
     {
@@ -19,7 +20,8 @@ class TaiChinhService implements TaiChinhServiceInterface
 
         $data = Hoadon::where('trangthaithanhtoan', Hoadon::trangThaiQuaHan())
             ->when($tuKhoa, function ($q) use ($tuKhoa) {
-                $q->whereHas('sinhvien', fn ($sq) => $sq->where('masinhvien', 'like', "%{$tuKhoa}%"));
+                $escapedTuKhoa = $this->thoatKyTuLike($tuKhoa);
+                $q->whereHas('sinhvien', fn ($sq) => $sq->where('masinhvien', 'like', "%{$escapedTuKhoa}%"));
             })
             ->with(['sinhvien.taikhoan', 'phong'])
             ->orderByDesc('created_at')
@@ -65,18 +67,18 @@ class TaiChinhService implements TaiChinhServiceInterface
         try {
             $hoadon = Hoadon::with('sinhvien')->find($invoiceId);
             if (! $hoadon) {
-                return $this->traVeLoi('Khong tim thay hoa don.');
+                return $this->traVeLoi('Không tìm thấy hóa đơn.');
             }
 
             Thongbao::create([
-                'tieude' => 'Nhac nho thanh toan cong no',
-                'noidung' => "Yeu cau sinh vien thanh toan hoa don #{$hoadon->id} tri gia " . number_format((int) $hoadon->tongtien) . 'd.',
+                'tieude' => 'Nhắc nhở thanh toán công nợ',
+                'noidung' => "Yêu cầu sinh viên thanh toán hóa đơn #{$hoadon->id} trị giá " . number_format((int) $hoadon->tongtien) . 'đ.',
                 'doituong' => 'sinhvien',
                 'sinhvien_id' => $hoadon->sinhvien_id,
                 'ngaydang' => now(),
             ]);
 
-            return $this->traVeThanhCong('Da gui thong bao nhac no.');
+            return $this->traVeThanhCong('Đã gửi thông báo nhắc nợ.');
         } catch (\Throwable $e) {
             return $this->traVeLoi($e->getMessage());
         }
@@ -90,13 +92,13 @@ class TaiChinhService implements TaiChinhServiceInterface
             ->pluck('id');
 
         if ($invoiceIds->isEmpty()) {
-            return $this->traVeLoi('Khong co hoa don qua han de gui nhac no.');
+            return $this->traVeLoi('Không có hóa đơn quá hạn để gửi nhắc nợ.');
         }
 
         foreach ($invoiceIds as $invoiceId) {
             $this->nhacNo((int) $invoiceId);
         }
 
-        return $this->traVeThanhCong('Da gui thong bao nhac no cho phong.');
+        return $this->traVeThanhCong('Đã gửi thông báo nhắc nợ cho phòng.');
     }
 }

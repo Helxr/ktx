@@ -19,8 +19,8 @@ class TraPhongService implements TraPhongServiceInterface
     use PhanHoiService;
 
     public function __construct(
-        private ContractService $contractService,
-        private HoadonService $invoiceService
+        private \App\Services\Admin\HopdongService $contractService,
+        private \App\Services\Admin\HoadonService $invoiceService
     ) {}
 
     public function kiemTraNo(Sinhvien $sinhvien): array
